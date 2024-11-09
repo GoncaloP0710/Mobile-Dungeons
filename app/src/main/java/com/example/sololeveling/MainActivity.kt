@@ -11,7 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.sololeveling.navigation.NavGraph
+import com.example.sololeveling.navigation.Screens
 import com.example.sololeveling.ui.theme.SoloLevelingTheme
+import com.example.sololeveling.ui.screens.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +23,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SoloLevelingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                val navController = rememberNavController()
+                NavGraph(navController = navController)
             }
         }
     }
 }
 
+@Preview
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SoloLevelingTheme {
-        Greeting("Android")
-    }
+fun SoloLevelingApp() {
+    val id = 1
+    rememberNavController().navigate("home_screen/$id")
 }
