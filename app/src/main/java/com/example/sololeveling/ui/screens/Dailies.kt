@@ -22,10 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import kotlinx.coroutines.awaitAll
 import kotlin.math.sqrt
-
-// State to hold the total magnetic field value
 
 @Composable
 fun Dailies(
@@ -34,6 +31,8 @@ fun Dailies(
     context: Context // Pass context to access SensorManager
 ) {
     var magneticField by remember { mutableDoubleStateOf(0.0) }
+    var ambientTemperature by remember { mutableDoubleStateOf(0.0) }
+    var pressure by remember { mutableDoubleStateOf(0.0) }
 
     Box {
         Column(
@@ -43,13 +42,28 @@ fun Dailies(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Display Magnetic Field
             Text(
                 text = "Magnetic Field: $magneticField µT",
             )
-
-            // Magnetic sensor measure button
             Button(onClick = { measureMagneticField(context) { magneticField = it } }) {
                 Text("Scan Portal")
+            }
+
+            // Display Ambient Temperature
+            Text(
+                text = "Ambient Temperature: $ambientTemperature °C",
+            )
+            Button(onClick = { measureAmbientTemperature(context) { ambientTemperature = it } }) {
+                Text("Measure Temperature")
+            }
+
+            // Display Pressure
+            Text(
+                text = "Pressure: $pressure hPa",
+            )
+            Button(onClick = { measurePressure(context) { pressure = it } }) {
+                Text("Measure Pressure")
             }
 
             // Home Screen button
@@ -60,6 +74,7 @@ fun Dailies(
     }
 }
 
+// Measure Magnetic Field
 fun measureMagneticField(context: Context, onResult: (Double) -> Unit) {
     val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     val magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
@@ -74,9 +89,9 @@ fun measureMagneticField(context: Context, onResult: (Double) -> Unit) {
         override fun onSensorChanged(event: SensorEvent?) {
             if (event == null) return
 
-            val magneticFieldX = event.values[0] // µT along X-axis
-            val magneticFieldY = event.values[1] // µT along Y-axis
-            val magneticFieldZ = event.values[2] // µT along Z-axis
+            val magneticFieldX = event.values[0]
+            val magneticFieldY = event.values[1]
+            val magneticFieldZ = event.values[2]
 
             val totalMagneticField = sqrt(
                 (magneticFieldX * magneticFieldX +
@@ -85,17 +100,63 @@ fun measureMagneticField(context: Context, onResult: (Double) -> Unit) {
             )
 
             onResult(totalMagneticField)
-
-            // Stop listening after one measurement
             sensorManager.unregisterListener(this)
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
     }
 
-    sensorManager.registerListener(
-        sensorEventListener,
-        magneticSensor,
-        SensorManager.SENSOR_DELAY_NORMAL
-    )
+    sensorManager.registerListener(sensorEventListener, magneticSensor, SensorManager.SENSOR_DELAY_NORMAL)
+}
+
+// Measure Ambient Temperature
+fun measureAmbientTemperature(context: Context, onResult: (Double) -> Unit) {
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val temperatureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
+
+    if (temperatureSensor == null) {
+        Toast.makeText(context, "Ambient temperature sensor not available", Toast.LENGTH_SHORT).show()
+        onResult(0.0)
+        return
+    }
+
+    val sensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event == null) return
+
+            val ambientTemp = event.values[0] // Temperature in degrees Celsius
+            onResult(ambientTemp.toDouble())
+            sensorManager.unregisterListener(this)
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    sensorManager.registerListener(sensorEventListener, temperatureSensor, SensorManager.SENSOR_DELAY_NORMAL)
+}
+
+// Measure Pressure
+fun measurePressure(context: Context, onResult: (Double) -> Unit) {
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
+
+    if (pressureSensor == null) {
+        Toast.makeText(context, "Pressure sensor not available", Toast.LENGTH_SHORT).show()
+        onResult(0.0)
+        return
+    }
+
+    val sensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event == null) return
+
+            val pressureValue = event.values[0] // Pressure in hPa (hectopascal)
+            onResult(pressureValue.toDouble())
+            sensorManager.unregisterListener(this)
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    sensorManager.registerListener(sensorEventListener, pressureSensor, SensorManager.SENSOR_DELAY_NORMAL)
 }
