@@ -1,5 +1,6 @@
 package com.example.sololeveling.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,12 +12,11 @@ import com.example.sololeveling.ui.screens.Map
 import com.example.sololeveling.ui.screens.Storage
 
 @Composable
-fun NavGraph (navController: NavHostController){
+fun NavGraph(navController: NavHostController, context: Context) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route)
-    {
-
+        startDestination = Screens.HomeScreen.route
+    ) {
         // Home Screen
         composable(
             route = Screens.HomeScreen.route + "?id={id}"
@@ -38,7 +38,7 @@ fun NavGraph (navController: NavHostController){
             route = Screens.Dailies.route + "?id={id}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Dailies(navController = navController, id = id)
+            Dailies(navController = navController, id = id, context = context)
         }
 
         // Guild
@@ -56,6 +56,5 @@ fun NavGraph (navController: NavHostController){
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
             Map(navController = navController, id = id)
         }
-
     }
 }

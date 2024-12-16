@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SoloLevelingTheme {
                 val navController = rememberNavController()
-                NavGraph(navController = navController)
+                NavGraph(navController = navController, context = this)
             }
         }
     }
