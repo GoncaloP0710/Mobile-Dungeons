@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,7 +32,7 @@ fun Dailies(
     context: Context // Pass context to access SensorManager
 ) {
     var magneticField by remember { mutableDoubleStateOf(0.0) }
-    var ambientTemperature by remember { mutableDoubleStateOf(0.0) }
+    var ambientTemperature by remember { mutableFloatStateOf(0.0F) }
     var pressure by remember { mutableDoubleStateOf(0.0) }
 
     Box {
@@ -110,13 +111,13 @@ fun measureMagneticField(context: Context, onResult: (Double) -> Unit) {
 }
 
 // Measure Ambient Temperature
-fun measureAmbientTemperature(context: Context, onResult: (Double) -> Unit) {
+fun measureAmbientTemperature(context: Context, onResult: (Float) -> Unit) {
     val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     val temperatureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
 
     if (temperatureSensor == null) {
         Toast.makeText(context, "Ambient temperature sensor not available", Toast.LENGTH_SHORT).show()
-        onResult(0.0)
+        onResult(0.0F)
         return
     }
 
@@ -125,7 +126,7 @@ fun measureAmbientTemperature(context: Context, onResult: (Double) -> Unit) {
             if (event == null) return
 
             val ambientTemp = event.values[0] // Temperature in degrees Celsius
-            onResult(ambientTemp.toDouble())
+            onResult(ambientTemp)
             sensorManager.unregisterListener(this)
         }
 
