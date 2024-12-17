@@ -34,6 +34,8 @@ fun Dailies(
     var magneticField by remember { mutableDoubleStateOf(0.0) }
     var ambientTemperature by remember { mutableFloatStateOf(0.0F) }
     var pressure by remember { mutableDoubleStateOf(0.0) }
+    var lightLevel by remember { mutableFloatStateOf(0.0F) }
+    var humidity by remember { mutableFloatStateOf(0.0F) }
 
     Box {
         Column(
@@ -65,6 +67,18 @@ fun Dailies(
             )
             Button(onClick = { measurePressure(context) { pressure = it } }) {
                 Text("Measure Pressure")
+            }
+
+            // Humidity
+            Text(text = "Humidity: $humidity %")
+            Button(onClick = { measureHumidity(context) { humidity = it } }) {
+                Text("Measure Humidity")
+            }
+
+            // Light Level
+            Text(text = "Light Level: $lightLevel lx")
+            Button(onClick = { measureLight(context) { lightLevel = it } }) {
+                Text("Measure Light")
             }
 
             // Home Screen button
@@ -160,4 +174,56 @@ fun measurePressure(context: Context, onResult: (Double) -> Unit) {
     }
 
     sensorManager.registerListener(sensorEventListener, pressureSensor, SensorManager.SENSOR_DELAY_NORMAL)
+}
+
+// Measure Humidity
+fun measureHumidity(context: Context, onResult: (Float) -> Unit) {
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val humiditySensor = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)
+
+    if (humiditySensor == null) {
+        Toast.makeText(context, "Humidity sensor not available", Toast.LENGTH_SHORT).show()
+        onResult(0.0F)
+        return
+    }
+
+    val sensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event == null) return
+
+            val humidity = event.values[0]
+            onResult(humidity)
+            sensorManager.unregisterListener(this)
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    sensorManager.registerListener(sensorEventListener, humiditySensor, SensorManager.SENSOR_DELAY_NORMAL)
+}
+
+// Measure Light Level
+fun measureLight(context: Context, onResult: (Float) -> Unit) {
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
+    if (lightSensor == null) {
+        Toast.makeText(context, "Light sensor not available", Toast.LENGTH_SHORT).show()
+        onResult(0.0F)
+        return
+    }
+
+    val sensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event == null) return
+
+            val lightLevel = event.values[0]
+            onResult(lightLevel)
+            sensorManager.unregisterListener(this)
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
+    sensorManager.registerListener(sensorEventListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
 }
