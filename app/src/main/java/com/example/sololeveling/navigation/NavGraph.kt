@@ -12,11 +12,12 @@ import com.example.sololeveling.ui.screens.Map
 import com.example.sololeveling.ui.screens.Storage
 import com.google.firebase.database.FirebaseDatabase
 
+
 @Composable
 fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route
+        startDestination = Screens.HomeScreen.route,
     ) {
         // Home Screen
         composable(
@@ -28,11 +29,19 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
 
         // Storage
         composable(
-            route = Screens.Storage.route + "?id={id}"
+            route = Screens.Storage.route + "?id={id}&username={username}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Storage(navController = navController, id = id)
+            val name: String? = navBackStack.arguments?.getString("username")
+            if (name != null) {
+                println("name is not null")
+                Storage(navController = navController, id = id, db, name)
+            } else {
+                println("id: $id")
+                println("name is null")
+            }
         }
+
 
         // Dailies
         composable(

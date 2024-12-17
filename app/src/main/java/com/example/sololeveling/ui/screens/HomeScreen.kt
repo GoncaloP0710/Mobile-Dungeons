@@ -2,6 +2,8 @@ package com.example.sololeveling.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -9,9 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -27,8 +32,8 @@ fun HomeScreen(
     id: Int,
     db: FirebaseDatabase
 ) {
-    var showDialog by remember { mutableStateOf(true) }
-    var username by remember { mutableStateOf("") }
+    var showDialog by rememberSaveable { mutableStateOf(true) }
+    var username by rememberSaveable { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoginSuccessful by remember { mutableStateOf(false) }
     var loginErrorMessage by remember { mutableStateOf("") }
@@ -37,6 +42,34 @@ fun HomeScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+
+        Image(
+            painter = painterResource(id = R.drawable.huntersguildgate),
+            contentDescription = "Background Image",
+            modifier = Modifier
+                .fillMaxSize(), // Make the image fill the entire screen
+            contentScale = ContentScale.Crop // Ensure the image covers the entire area
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(16.dp) // Adjust padding as needed
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.End // Align content to the start (left)
+
+        ) {
+            Box(modifier = Modifier.clickable { navController.navigate("storage_screen/$id?username=$username") }) {
+                Image(
+                    painter = painterResource(id = R.drawable.usericon),
+                    contentDescription = "Icon Image",
+                    modifier = Modifier
+                        .size(160.dp) // Adjust size as needed
+                )
+            }
+
+            Text(text = username)
+        }
+
         Image(
             painter = painterResource(id = R.drawable.userfullbody),
             contentDescription = "Home Image",
@@ -56,7 +89,6 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .wrapContentSize()
                 ) {
-                    Text("Login", modifier = Modifier.padding(bottom = 16.dp))
 
                     // Username input
                     OutlinedTextField(
@@ -98,28 +130,29 @@ fun HomeScreen(
         }
 
         // Buttons at the bottom of the screen, overlaid on top of the image
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
+                .background(Color.Black.copy(alpha = 0.5f)) // Semi-transparent background
+                .padding(16.dp)
         ) {
-            Button(onClick = { navController.navigate("storage_screen/$id") }) {
-                Text("Storage")
-            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { navController.navigate("map_screen/$id") }) {
+                    Text("Map")
+                }
 
-            Button(onClick = { navController.navigate("map_screen/$id") }) {
-                Text("Map")
-            }
+                Button(onClick = { navController.navigate("dailies_screen/$id") }) {
+                    Text("Dailies")
+                }
 
-            Button(onClick = { navController.navigate("dailies_screen/$id") }) {
-                Text("Dailies")
-            }
-
-            Button(onClick = { navController.navigate("guild_screen/$id") }) {
-                Text("Guild")
+                Button(onClick = { navController.navigate("guild_screen/$id") }) {
+                    Text("Guild")
+                }
             }
         }
     }
