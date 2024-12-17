@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.sololeveling" />
+                  <option name="mobileSdkAppId" value="1:6020355760:android:70e2ad155b95972ca64d75" />
+                  <option name="projectId" value="codelab-friendlychat-and-fe112" />
+                  <option name="projectNumber" value="6020355760" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

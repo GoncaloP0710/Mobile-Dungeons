@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "6020355760",
+    "firebase_url": "https://codelab-friendlychat-and-fe112-default-rtdb.firebaseio.com",
+    "project_id": "codelab-friendlychat-and-fe112",
+    "storage_bucket": "codelab-friendlychat-and-fe112.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6020355760:android:25bf1f2ea71c1b88a64d75",
+        "android_client_info": {
+          "package_name": "com.example.marsphotos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM6zz4Wr_aSF60rUY9EQ4wXdEkmdtLuJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6020355760:android:70e2ad155b95972ca64d75",
+        "android_client_info": {
+          "package_name": "com.example.sololeveling"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM6zz4Wr_aSF60rUY9EQ4wXdEkmdtLuJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6020355760:android:6a68afb1b78db92da64d75",
+        "android_client_info": {
+          "package_name": "com.google.firebase.codelab.friendlychat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM6zz4Wr_aSF60rUY9EQ4wXdEkmdtLuJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6020355760:android:a1e48728c86d3f05a64d75",
+        "android_client_info": {
+          "package_name": "com.lab4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM6zz4Wr_aSF60rUY9EQ4wXdEkmdtLuJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6020355760-6r26geaqefbpp3b392rq7e9gl902pv58.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

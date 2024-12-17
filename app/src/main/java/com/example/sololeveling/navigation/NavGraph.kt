@@ -10,9 +10,10 @@ import com.example.sololeveling.ui.screens.Guild
 import com.example.sololeveling.ui.screens.HomeScreen
 import com.example.sololeveling.ui.screens.Map
 import com.example.sololeveling.ui.screens.Storage
+import com.google.firebase.database.FirebaseDatabase
 
 @Composable
-fun NavGraph(navController: NavHostController, context: Context) {
+fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
         navController = navController,
         startDestination = Screens.HomeScreen.route
@@ -22,7 +23,7 @@ fun NavGraph(navController: NavHostController, context: Context) {
             route = Screens.HomeScreen.route + "?id={id}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            HomeScreen(navController = navController, id = id)
+            HomeScreen(navController = navController, id = id, db)
         }
 
         // Storage

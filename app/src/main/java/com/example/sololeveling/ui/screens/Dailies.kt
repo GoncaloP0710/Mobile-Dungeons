@@ -1,5 +1,6 @@
 package com.example.sololeveling.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +64,7 @@ data class MonsterDetails(
     @SerializedName("challenge_rating") val challengeRating: Double
 )
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Dailies(
     navController: NavController,
@@ -84,68 +88,85 @@ fun Dailies(
         }
     }
 
-    Box {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Scaffold(
+        topBar = {
+            // You can add a top bar if necessary
+        },
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Display Magnetic Field
+                Text(text = "Magnetic Field: $magneticField µT")
+                Button(onClick = { measureMagneticField(context) { magneticField = it } }) {
+                    Text("Scan Portal")
+                }
 
-            if (isLoading) {
-                CircularProgressIndicator()
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(monsterDetailsList) { monster ->
-                        MonsterCard(monster)
+                // Display Ambient Temperature
+                Text(text = "Ambient Temperature: $ambientTemperature °C")
+                Button(onClick = { measureAmbientTemperature(context) { ambientTemperature = it } }) {
+                    Text("Measure Temperature")
+                }
+
+                // Display Pressure
+                Text(text = "Pressure: $pressure hPa")
+                Button(onClick = { measurePressure(context) { pressure = it } }) {
+                    Text("Measure Pressure")
+                }
+
+                // Humidity
+                Text(text = "Humidity: $humidity %")
+                Button(onClick = { measureHumidity(context) { humidity = it } }) {
+                    Text("Measure Humidity")
+                }
+
+                // Light Level
+                Text(text = "Light Level: $lightLevel lx")
+                Button(onClick = { measureLight(context) { lightLevel = it } }) {
+                    Text("Measure Light")
+                }
+
+                if (isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(monsterDetailsList) { monster ->
+                            MonsterCard(monster)
+                        }
                     }
                 }
             }
+        }
+    )
+}
 
-            // Display Magnetic Field
-            Text(
-                text = "Magnetic Field: $magneticField µT",
-            )
-            Button(onClick = { measureMagneticField(context) { magneticField = it } }) {
-                Text("Scan Portal")
-            }
-
-            // Display Ambient Temperature
-            Text(
-                text = "Ambient Temperature: $ambientTemperature °C",
-            )
-            Button(onClick = { measureAmbientTemperature(context) { ambientTemperature = it } }) {
-                Text("Measure Temperature")
-            }
-
-            // Display Pressure
-            Text(
-                text = "Pressure: $pressure hPa",
-            )
-            Button(onClick = { measurePressure(context) { pressure = it } }) {
-                Text("Measure Pressure")
-            }
-
-            // Humidity
-            Text(text = "Humidity: $humidity %")
-            Button(onClick = { measureHumidity(context) { humidity = it } }) {
-                Text("Measure Humidity")
-            }
-
-            // Light Level
-            Text(text = "Light Level: $lightLevel lx")
-            Button(onClick = { measureLight(context) { lightLevel = it } }) {
-                Text("Measure Light")
-            }
-
-            // Home Screen button
-            Button(onClick = { navController.navigate("home_screen/$id") }) {
-                Text("Home")
-            }
+@Composable
+fun MonsterCard(monster: MonsterDetails) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .heightIn(min = 120.dp) // Ensure a minimum height for each card
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth() // Ensure the content inside takes full width
+        ) {
+            Text("Name: ${monster.name}", style = MaterialTheme.typography.titleMedium)
+            Text("Size: ${monster.size}")
+            Text("Type: ${monster.type}")
+            Text("Hit Points: ${monster.hitPoints}")
+            Text("Challenge Rating: ${monster.challengeRating}")
         }
     }
 }
@@ -287,27 +308,6 @@ fun measureLight(context: Context, onResult: (Float) -> Unit) {
     }
 
     sensorManager.registerListener(sensorEventListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
-}
-
-@Composable
-fun MonsterCard(monster: MonsterDetails) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("Name: ${monster.name}", style = MaterialTheme.typography.titleMedium)
-            Text("Size: ${monster.size}")
-            Text("Type: ${monster.type}")
-            Text("Hit Points: ${monster.hitPoints}")
-            Text("Challenge Rating: ${monster.challengeRating}")
-        }
-    }
 }
 
 // Function to fetch 5 random monsters and their details

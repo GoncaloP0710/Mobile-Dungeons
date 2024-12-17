@@ -1,26 +1,42 @@
 package com.example.sololeveling.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.sololeveling.R
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.getValue
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    id: Int
+    id: Int,
+    db: FirebaseDatabase
 ) {
+    var showDialog by remember { mutableStateOf(true) }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoginSuccessful by remember { mutableStateOf(false) }
+    var loginErrorMessage by remember { mutableStateOf("") }
+
+    // Image as background
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Image as background
         Image(
             painter = painterResource(id = R.drawable.userfullbody),
             contentDescription = "Home Image",
@@ -30,6 +46,56 @@ fun HomeScreen(
                 .fillMaxSize()
                 .height(250.dp), // Adjust height as needed
         )
+
+        // Login Dialog
+        if (showDialog) {
+            Dialog(onDismissRequest = { /* Do nothing to keep it open until valid login */ }) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .wrapContentSize()
+                ) {
+                    Text("Login", modifier = Modifier.padding(bottom = 16.dp))
+
+                    // Username input
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Username") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    // Password input
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password") },
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+
+                    // Show login error message if any
+                    if (loginErrorMessage.isNotEmpty()) {
+                        Text(text = loginErrorMessage, color = Color.Red)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Login Button
+                    Button(onClick = {
+                        loginUser(db, username, password, {
+                            showDialog = false
+                            isLoginSuccessful = true
+                        }, { errorMessage ->
+                            loginErrorMessage = errorMessage
+                        })
+                    }) {
+                        Text("Login")
+                    }
+                }
+            }
+        }
 
         // Buttons at the bottom of the screen, overlaid on top of the image
         Row(
@@ -56,5 +122,29 @@ fun HomeScreen(
                 Text("Guild")
             }
         }
+    }
+}
+
+fun loginUser(
+    db: FirebaseDatabase,
+    username: String,
+    password: String,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
+    val usersRef = db.getReference("Users")
+    usersRef.child(username).get().addOnSuccessListener { snapshot ->
+        if (snapshot.exists()) {
+            val storedPassword = snapshot.child("Pass").getValue<String>()
+            if (storedPassword == password) {
+                onSuccess() // Successfully logged in
+            } else {
+                onError("Incorrect password.")
+            }
+        } else {
+            onError("User not found.")
+        }
+    }.addOnFailureListener {
+        onError("Login failed. Please try again.")
     }
 }
