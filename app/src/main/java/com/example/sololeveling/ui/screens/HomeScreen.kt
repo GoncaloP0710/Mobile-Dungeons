@@ -66,8 +66,6 @@ fun HomeScreen(
                         .size(160.dp) // Adjust size as needed
                 )
             }
-
-            Text(text = username)
         }
 
         Image(
