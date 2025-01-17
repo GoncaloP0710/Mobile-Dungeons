@@ -2,6 +2,7 @@ package com.example.sololeveling.navigation
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -64,7 +65,7 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
             route = Screens.Map.route + "?id={id}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Map(navController = navController, id = id)
+            Map(navController = navController, id = id, context = LocalContext.current)
         }
     }
 }

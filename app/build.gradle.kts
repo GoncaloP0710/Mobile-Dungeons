@@ -101,4 +101,8 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.9.3") // HTTP client
     implementation("com.google.code.gson:gson:2.8.9")   // JSON parsing
+
+    implementation("org.osmdroid:osmdroid-android:6.1.12") // Check for the latest version
+
+
 }
