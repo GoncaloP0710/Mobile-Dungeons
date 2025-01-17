@@ -17,14 +17,19 @@ import com.google.firebase.database.FirebaseDatabase
 fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route,
+        startDestination = Screens.HomeScreen.route+"?id=6",
     ) {
         // Home Screen
         composable(
             route = Screens.HomeScreen.route + "?id={id}"
         ) { navBackStack ->
-            val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            HomeScreen(navController = navController, id = id, db)
+            var id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull()?:1
+            var Notlogged: Boolean = false
+            if(id == 6){
+                Notlogged = true
+                id = 5
+            }
+            HomeScreen(navController = navController, id = id, db, Notlogged)
         }
 
         // Storage

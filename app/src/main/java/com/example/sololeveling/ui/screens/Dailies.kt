@@ -91,6 +91,9 @@ fun Dailies(
     Scaffold(
         topBar = {
             // You can add a top bar if necessary
+            Button(onClick = { navController.navigate("home_screen/$id") }) {
+                Text("Home")
+            }
         },
         content = {
             Column(
