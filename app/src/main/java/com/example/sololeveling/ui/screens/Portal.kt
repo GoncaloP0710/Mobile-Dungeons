@@ -2,6 +2,7 @@ package com.example.sololeveling.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build.VERSION.SDK_INT
 import android.os.CountDownTimer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,14 +21,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import coil.ImageLoader
 import com.example.sololeveling.R
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
@@ -41,9 +46,12 @@ fun Portal(
 ){
     var magneticField by remember { mutableDoubleStateOf(0.0) }
     var wait by remember { mutableStateOf(true) }
+    
 
     val timer = object: CountDownTimer(2000, 100) {
-        override fun onTick(millisUntilFinished: Long) {}
+        override fun onTick(millisUntilFinished: Long) {
+
+        }
 
         override fun onFinish() {wait = false}
     }
@@ -68,12 +76,54 @@ fun Portal(
                 }else{
                     measureMagneticField(context) { magneticField = it }
                     when(magneticField){
-                        in -100.0 .. -67.0 -> Text("E rank")
-                        in -67.0 .. -34.0 -> Text("D rank")
-                        in -34.0 .. 0.0 -> Text("C rank")
-                        in 0.0 .. 33.0 -> Text("B rank")
-                        in 33.0 .. 66.0 -> Text("A rank")
-                        in 66.0 .. 100.0 -> Text("S rank")
+                        in -100.0 .. -67.0 -> Text(text="E rank",
+                            style = TextStyle(
+                                fontSize = 64.sp,
+                                fontWeight = FontWeight.Bold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                )))
+
+                        in -67.0 .. -34.0 -> Text(text="D rank",
+                            style = TextStyle(
+                                fontSize = 64.sp,
+                                fontWeight = FontWeight.Bold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                )))
+
+                        in -34.0 .. 0.0 -> Text(text="C rank",
+                            style = TextStyle(
+                                fontSize = 64.sp,
+                                fontWeight = FontWeight.Bold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                )))
+
+                        in 0.0 .. 33.0 -> Text(text="B rank",
+                            style = TextStyle(
+                                fontSize = 64.sp,
+                                fontWeight = FontWeight.Bold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                )))
+
+                        in 33.0 .. 66.0 -> Text(text="A rank",
+                            style = TextStyle(
+                                fontSize = 64.sp,
+                                fontWeight = FontWeight.Bold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                )))
+
+                        in 66.0 .. 100.0 -> Text(text="S rank",
+                            style = TextStyle(
+                                fontSize = 64.sp,
+                                fontWeight = FontWeight.Bold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                )))
+
                         else -> Text("Erro: + $magneticField")
                     }
                     Spacer(Modifier.size(32.dp))
