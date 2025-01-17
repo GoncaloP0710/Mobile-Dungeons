@@ -112,16 +112,35 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Login Button
-                    Button(onClick = {
-                        loginUser(db, username, password, {
+                    // Buttons in a horizontal row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        // Login Button
+                        Button(onClick = {
+                            loginUser(db, username, password, {
+                                showDialog = false
+                                isLoginSuccessful = true
+                            }, { errorMessage ->
+                                loginErrorMessage = errorMessage
+                            })
+                        }) {
+                            Text("Login")
+                        }
+
+                        // Register Button
+                        Button(onClick = {
+                            val newUser = mapOf(
+                                "Name" to username,
+                                "Pass" to password
+                            )
+                            db.reference.child("Users").child(username).setValue(newUser)
+                                .addOnSuccessListener { /* Handle success if needed */ }
+                                .addOnFailureListener { /* Handle error if needed */ }
                             showDialog = false
-                            isLoginSuccessful = true
-                        }, { errorMessage ->
-                            loginErrorMessage = errorMessage
-                        })
-                    }) {
-                        Text("Login")
+                        }) {
+                            Text("Create Account")
+                        }
                     }
                 }
             }

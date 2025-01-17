@@ -7,6 +7,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,8 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sololeveling.R
 import kotlin.math.sqrt
 
 import okhttp3.*
@@ -88,63 +93,82 @@ fun Dailies(
         }
     }
 
-    Scaffold(
-        topBar = {
-            // You can add a top bar if necessary
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Display Magnetic Field
-                Text(text = "Magnetic Field: $magneticField µT")
-                Button(onClick = { measureMagneticField(context) { magneticField = it } }) {
-                    Text("Scan Portal")
-                }
+    // Image as background
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
 
-                // Display Ambient Temperature
-                Text(text = "Ambient Temperature: $ambientTemperature °C")
-                Button(onClick = { measureAmbientTemperature(context) { ambientTemperature = it } }) {
-                    Text("Measure Temperature")
-                }
+        Image(
+            painter = painterResource(id = R.drawable.huntersguildgate),
+            contentDescription = "Background Image",
+            modifier = Modifier
+                .fillMaxSize(), // Make the image fill the entire screen
+            contentScale = ContentScale.Crop // Ensure the image covers the entire area
+        )
 
-                // Display Pressure
-                Text(text = "Pressure: $pressure hPa")
-                Button(onClick = { measurePressure(context) { pressure = it } }) {
-                    Text("Measure Pressure")
-                }
+        Scaffold(
+            topBar = {
+                // You can add a top bar if necessary
+            },
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Display Magnetic Field
+                    Text(text = "Magnetic Field: $magneticField µT")
+                    Button(onClick = { measureMagneticField(context) { magneticField = it } }) {
+                        Text("Scan Portal")
+                    }
 
-                // Humidity
-                Text(text = "Humidity: $humidity %")
-                Button(onClick = { measureHumidity(context) { humidity = it } }) {
-                    Text("Measure Humidity")
-                }
+                    // Display Ambient Temperature
+                    Text(text = "Ambient Temperature: $ambientTemperature °C")
+                    Button(onClick = {
+                        measureAmbientTemperature(context) {
+                            ambientTemperature = it
+                        }
+                    }) {
+                        Text("Measure Temperature")
+                    }
 
-                // Light Level
-                Text(text = "Light Level: $lightLevel lx")
-                Button(onClick = { measureLight(context) { lightLevel = it } }) {
-                    Text("Measure Light")
-                }
+                    // Display Pressure
+                    Text(text = "Pressure: $pressure hPa")
+                    Button(onClick = { measurePressure(context) { pressure = it } }) {
+                        Text("Measure Pressure")
+                    }
 
-                if (isLoading) {
-                    CircularProgressIndicator()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(monsterDetailsList) { monster ->
-                            MonsterCard(monster)
+                    // Humidity
+                    Text(text = "Humidity: $humidity %")
+                    Button(onClick = { measureHumidity(context) { humidity = it } }) {
+                        Text("Measure Humidity")
+                    }
+
+                    // Light Level
+                    Text(text = "Light Level: $lightLevel lx")
+                    Button(onClick = { measureLight(context) { lightLevel = it } }) {
+                        Text("Measure Light")
+                    }
+
+                    if (isLoading) {
+                        CircularProgressIndicator()
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(monsterDetailsList) { monster ->
+                                MonsterCard(monster)
+                            }
                         }
                     }
                 }
             }
-        }
-    )
+        )
+    }
+
 }
 
 @Composable
