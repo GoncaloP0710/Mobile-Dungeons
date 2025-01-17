@@ -1,10 +1,12 @@
 package com.example.sololeveling.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.sololeveling.R
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 
@@ -144,6 +149,8 @@ fun HomeScreen(
                     }
                 }
             }
+        } else {
+            ListenForFriendRequestsScreen(db, username)
         }
 
         // Buttons at the bottom of the screen, overlaid on top of the image
@@ -167,7 +174,7 @@ fun HomeScreen(
                     Text("Dailies")
                 }
 
-                Button(onClick = { navController.navigate("guild_screen/$id") }) {
+                Button(onClick = { navController.navigate("guild_screen/$id?username=$username") }) {
                     Text("Guild")
                 }
             }
@@ -198,3 +205,75 @@ fun loginUser(
         onError("Login failed. Please try again.")
     }
 }
+
+@Composable
+fun ListenForFriendRequestsScreen(db: FirebaseDatabase, userName: String) {
+    val showDialog = remember { mutableStateOf(false) }
+    var newRequestName by remember { mutableStateOf("") }
+
+    // Reference to the FriendRequests node for the current user
+    val friendRequestsRef = db.reference.child("FriendRequests").child(userName)
+
+    // Set up a listener for new friend requests
+    DisposableEffect(friendRequestsRef) {
+        val listener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                // New friend request detected
+                val requestName = snapshot.getValue(String::class.java)
+                if (requestName != null) {
+                    newRequestName = requestName
+                    showDialog.value = true
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", error.message)
+            }
+        }
+
+        // Attach listener
+        friendRequestsRef.addChildEventListener(listener)
+
+        // Clean up when Composable is disposed
+        onDispose {
+            friendRequestsRef.removeEventListener(listener)
+        }
+    }
+
+    // Show Notification Dialog when a new friend request arrives
+    if (showDialog.value) {
+        NotificationDialog(
+            showDialog = showDialog,
+            name = newRequestName
+        )
+    }
+
+    // Example content
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Listening for new friend requests...")
+    }
+}
+
+@Composable
+fun NotificationDialog(showDialog: MutableState<Boolean>, name: String) {
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text("New Friend Request") },
+        text = { Text("You have a new friend request from $name!") },
+        confirmButton = {
+            Button(onClick = { showDialog.value = false }) {
+                Text("Dismiss")
+            }
+        }
+    )
+}
+
