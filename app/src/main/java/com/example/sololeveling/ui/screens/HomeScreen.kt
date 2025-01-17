@@ -169,6 +169,10 @@ fun HomeScreen(
                 Button(onClick = { navController.navigate("guild_screen/$id") }) {
                     Text("Guild")
                 }
+
+                Button(onClick = { navController.navigate("portal_screen/$id") }) {
+                    Text("Portal")
+                }
             }
         }
     }

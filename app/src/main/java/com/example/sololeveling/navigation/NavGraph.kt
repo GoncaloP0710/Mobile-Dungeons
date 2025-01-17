@@ -9,6 +9,7 @@ import com.example.sololeveling.ui.screens.Dailies
 import com.example.sololeveling.ui.screens.Guild
 import com.example.sololeveling.ui.screens.HomeScreen
 import com.example.sololeveling.ui.screens.Map
+import com.example.sololeveling.ui.screens.Portal
 import com.example.sololeveling.ui.screens.Storage
 import com.google.firebase.database.FirebaseDatabase
 
@@ -70,6 +71,14 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
             Map(navController = navController, id = id)
+        }
+
+        //Portal
+        composable(
+            route = Screens.Portal.route + "?id={id}"
+        ) { navBackStack ->
+            val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
+            Portal(navController = navController, id = id, context = context)
         }
     }
 }
