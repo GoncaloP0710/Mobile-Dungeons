@@ -41,10 +41,17 @@ fun HomeScreen(
     navController: NavController,
     id: Int,
     db: FirebaseDatabase,
-    notlogged: Boolean = true
+    notlogged: Boolean = true,
+    user: String = ""
 ) {
+    println("USeR: " + user)
+    var user2 = user
+    if(user == "placeholder"){
+        user2 = ""
+    }
+    println("2: "+user2)
     var showDialog by rememberSaveable { mutableStateOf(notlogged) }
-    var username by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf(user2) }
     var password by remember { mutableStateOf("") }
     var isLoginSuccessful by remember { mutableStateOf(false) }
     var loginErrorMessage by remember { mutableStateOf("") }
@@ -90,6 +97,8 @@ fun HomeScreen(
         )
 
         // Login Dialog
+        println("DIALOG")
+        println(username)
         if (showDialog) {
             Dialog(onDismissRequest = { /* Do nothing to keep it open until valid login */ }) {
                 Column(
@@ -141,6 +150,10 @@ fun HomeScreen(
                     ) {
                         // Login Button
                         Button(onClick = {
+                            println("LOGIN")
+                            println(username)
+                            println(password)
+
                             loginUser(db, username, password, {
                                 showDialog = false
                                 isLoginSuccessful = true

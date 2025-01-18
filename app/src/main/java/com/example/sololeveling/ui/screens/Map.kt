@@ -39,8 +39,9 @@ fun Map(
     db: FirebaseDatabase,
     userName: String
 ) {
+    var user = userName
     // References to the user's data and portals in Firebase
-    val userPositionRef = db.reference.child("UserPosition").child(userName)
+    val userPositionRef = db.reference.child("UserPosition").child(user)
     val portalPositionRef = db.reference.child("Portals")
 
     // Configure OSMDroid
@@ -190,7 +191,7 @@ fun Map(
 
         // Botão para voltar à tela inicial
         Button(
-            onClick = { navController.navigate("home_screen/$id") },
+            onClick = { navController.navigate("home_screen/$id?username=$userName\"") },
             modifier = Modifier.padding(16.dp)
         ) {
             Text("Home")

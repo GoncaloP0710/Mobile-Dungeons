@@ -19,20 +19,43 @@ import com.google.firebase.database.FirebaseDatabase
 fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route+"?id=6",
+        startDestination = Screens.HomeScreen.route+"?id=6"+ "?username=",
     ) {
         // Home Screen
         composable(
-            route = Screens.HomeScreen.route + "?id={id}"
+            route = Screens.HomeScreen.route + "?id={id}" + "?username={username}"
         ) { navBackStack ->
             var id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull()?:1
+            val name: String? = navBackStack.arguments?.getString("username")
             var Notlogged: Boolean = false
             if(id == 6){
                 Notlogged = true
                 id = 5
             }
-            HomeScreen(navController = navController, id = id, db, Notlogged)
+            if(name == "placeholder"){
+                HomeScreen(navController = navController, id = id, db, Notlogged, "")
+            }
+            if(name != null){
+                HomeScreen(navController = navController, id = id, db, Notlogged, name)
+            }else{
+                HomeScreen(navController = navController, id = id, db, Notlogged, "")
+            }
+
         }
+
+        // TEMP Home Screen
+//        composable(
+//            route = Screens.HomeScreen.route + "?id={id}"
+//        ) { navBackStack ->
+//            var id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull()?:1
+//            var Notlogged: Boolean = false
+//            if(id == 6){
+//                Notlogged = true
+//                id = 5
+//            }
+//            HomeScreen(navController = navController, id = id, db, Notlogged)
+//
+//        }
 
         // Storage
         composable(

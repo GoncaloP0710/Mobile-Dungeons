@@ -91,7 +91,7 @@ fun Storage(
                 .fillMaxSize(), // Make the image fill the entire screen
             contentScale = ContentScale.Crop // Ensure the image covers the entire area
         )
-        Button(onClick = { navController.navigate("home_screen/$id") }) {
+        Button(onClick = { navController.navigate("home_screen/$id?username=$userName\"") }) {
             Text("Home")
         }
 
