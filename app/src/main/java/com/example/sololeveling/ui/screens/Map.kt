@@ -21,10 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -47,10 +44,10 @@ fun Map(
     // Configure OSMDroid
     Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
 
-    // Estado para armazenar localização atual
+    // Estado para armazenar localização atual e marcadores do Firebase
     var currentLocation by remember { mutableStateOf<GeoPoint?>(null) }
+    var firebaseMarkers by remember { mutableStateOf<List<Pair<String, GeoPoint>>>(emptyList()) }
     var hasLocationPermission by remember { mutableStateOf(false) }
-    var showCurrentLocationMarker by remember { mutableStateOf(false) }
 
     // Inicializar o LocationManager
     val locationManager = remember {
@@ -62,17 +59,6 @@ fun Map(
         object : LocationListener {
             override fun onLocationChanged(location: Location) {
                 currentLocation = GeoPoint(location.latitude, location.longitude)
-                val locationMap = mapOf(
-                    "latitude" to currentLocation!!.latitude,
-                    "longitude" to currentLocation!!.longitude
-                )
-                userPositionRef.child(userName).setValue(locationMap)
-                    .addOnSuccessListener {
-                        Toast.makeText(context, "Location updated to Firebase", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(context, "Failed to update location", Toast.LENGTH_SHORT).show()
-                    }
             }
 
             override fun onProviderEnabled(provider: String) {
@@ -122,34 +108,21 @@ fun Map(
         } else {
             startLocationUpdates(locationManager, locationListener, context)
         }
-    }
 
-    // Estado para armazenar marcadores da base de dados
-    val markers = remember { mutableStateListOf<Marker>() }
-
-    // Carregar marcadores da base de dados
-    LaunchedEffect(Unit) {
-        userPositionRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                markers.clear()
-                for (child in snapshot.children) {
-                    val latitude = child.child("latitude").getValue(Double::class.java)
-                    val longitude = child.child("longitude").getValue(Double::class.java)
-                    val name = child.key ?: "Unknown"
-                    if (latitude != null && longitude != null) {
-                        markers.add(Marker(null).apply {
-                            position = GeoPoint(latitude, longitude)
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            title = name
-                        })
-                    }
-                }
+        // Recuperar marcadores existentes do Firebase
+        userPositionRef.get().addOnSuccessListener { snapshot ->
+            val markers = snapshot.children.mapNotNull { child ->
+                val latitude = child.child("latitude").getValue(Double::class.java)
+                val longitude = child.child("longitude").getValue(Double::class.java)
+                val key = child.key
+                if (latitude != null && longitude != null && key != null) {
+                    key to GeoPoint(latitude, longitude)
+                } else null
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Erro ao carregar marcadores: ${error.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+            firebaseMarkers = markers
+        }.addOnFailureListener {
+            Toast.makeText(context, "Erro ao carregar dados do Firebase", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // Box layout para segurar o mapa e os botões
@@ -164,57 +137,56 @@ fun Map(
             },
             modifier = Modifier.fillMaxSize(),
             update = { mapView ->
-                mapView?.let { mapViewSafe -> // Operações apenas se o MapView não for null
-                    // Limpa os overlays antes de adicionar novamente
-                    mapViewSafe.overlays.clear()
+                currentLocation?.let { location ->
+                    mapView.controller.setCenter(location)
+                }
 
-                    // Adiciona marcadores da base de dados
-                    userPositionRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            for (child in snapshot.children) {
-                                val latitude = child.child("latitude").getValue(Double::class.java)
-                                val longitude = child.child("longitude").getValue(Double::class.java)
-                                val name = child.key ?: "Unknown"
-                                if (latitude != null && longitude != null) {
-                                    val marker = Marker(mapViewSafe).apply {
-                                        position = GeoPoint(latitude, longitude)
-                                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                                        title = name
-                                    }
-                                    mapViewSafe.overlays.add(marker)
-                                }
-                            }
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(context, "Erro ao carregar marcadores: ${error.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    })
-
-                    // Adiciona marcador da localização atual, se ativado
-                    if (showCurrentLocationMarker && currentLocation != null) {
-                        val currentMarker = Marker(mapViewSafe).apply {
-                            position = currentLocation!!
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            title = "Minha localização"
-                        }
-                        mapViewSafe.overlays.add(currentMarker)
+                // Adicionar marcadores do Firebase
+                mapView.overlays.clear()
+                firebaseMarkers.forEach { (_, geoPoint) ->
+                    val marker = Marker(mapView).apply {
+                        position = geoPoint
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        title = "Amigo"
                     }
+                    mapView.overlays.add(marker)
+                }
+
+                // Adicionar marcador da localização atual
+                currentLocation?.let { location ->
+                    val marker = Marker(mapView).apply {
+                        position = location
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        title = "Minha localização"
+                    }
+                    mapView.overlays.add(marker)
                 }
             }
         )
 
-
-        // Botão para mostrar marcador da localização atual
+        // Botão para salvar localização atual no Firebase
         Button(
             onClick = {
-                showCurrentLocationMarker = true
+                currentLocation?.let { location ->
+                    val locationMap = mapOf(
+                        "latitude" to location.latitude,
+                        "longitude" to location.longitude
+                    )
+                    userPositionRef.child(userName).setValue(locationMap)
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Localização salva no Firebase", Toast.LENGTH_SHORT).show()
+                            firebaseMarkers = firebaseMarkers + (userName to location)
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(context, "Falha ao salvar localização", Toast.LENGTH_SHORT).show()
+                        }
+                } ?: Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            Text("Minha Localização")
+            Text("Salvar Minha Localização")
         }
 
         // Botão para voltar à tela inicial
