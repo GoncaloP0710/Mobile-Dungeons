@@ -42,7 +42,7 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
             val name: String? = navBackStack.arguments?.getString("username")
             if (name != null) {
                 println("name is not null")
-                Storage(navController = navController, id = id, db, name)
+                Storage(navController = navController, id = id, db, name, context)
             } else {
                 println("id: $id")
                 println("name is null")
