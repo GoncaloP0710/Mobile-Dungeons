@@ -21,7 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -38,9 +41,8 @@ fun Map(
     db: FirebaseDatabase,
     userName: String
 ) {
-
     // Reference to the user's friends in Firebase
-    val userPositionRef = db.reference.child("UserPosition").child(userName)
+    val userPositionRef = db.reference.child("UserPosition")
 
     // Configure OSMDroid
     Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
@@ -48,6 +50,7 @@ fun Map(
     // Estado para armazenar localização atual
     var currentLocation by remember { mutableStateOf<GeoPoint?>(null) }
     var hasLocationPermission by remember { mutableStateOf(false) }
+    var showCurrentLocationMarker by remember { mutableStateOf(false) }
 
     // Inicializar o LocationManager
     val locationManager = remember {
@@ -59,12 +62,11 @@ fun Map(
         object : LocationListener {
             override fun onLocationChanged(location: Location) {
                 currentLocation = GeoPoint(location.latitude, location.longitude)
-                // Write the location to Firebase
                 val locationMap = mapOf(
                     "latitude" to currentLocation!!.latitude,
                     "longitude" to currentLocation!!.longitude
                 )
-                userPositionRef.setValue(locationMap)
+                userPositionRef.child(userName).setValue(locationMap)
                     .addOnSuccessListener {
                         Toast.makeText(context, "Location updated to Firebase", Toast.LENGTH_SHORT).show()
                     }
@@ -122,6 +124,34 @@ fun Map(
         }
     }
 
+    // Estado para armazenar marcadores da base de dados
+    val markers = remember { mutableStateListOf<Marker>() }
+
+    // Carregar marcadores da base de dados
+    LaunchedEffect(Unit) {
+        userPositionRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                markers.clear()
+                for (child in snapshot.children) {
+                    val latitude = child.child("latitude").getValue(Double::class.java)
+                    val longitude = child.child("longitude").getValue(Double::class.java)
+                    val name = child.key ?: "Unknown"
+                    if (latitude != null && longitude != null) {
+                        markers.add(Marker(null).apply {
+                            position = GeoPoint(latitude, longitude)
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            title = name
+                        })
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, "Erro ao carregar marcadores: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
     // Box layout para segurar o mapa e os botões
     Box(modifier = Modifier.fillMaxSize()) {
         // MapView
@@ -134,33 +164,30 @@ fun Map(
             },
             modifier = Modifier.fillMaxSize(),
             update = { mapView ->
-                currentLocation?.let { location ->
-                    mapView.controller.setCenter(location)
+                mapView.overlays.clear()
 
-                    // Adicionar marcador para localização atual
-                    val marker = Marker(mapView).apply {
-                        position = location
+                // Adicionar marcadores da base de dados
+                markers.forEach { marker ->
+                    marker.relatedObject = mapView // Atualizar o mapa
+                    mapView.overlays.add(marker)
+                }
+
+                // Adicionar marcador da localização atual, se ativado
+                if (showCurrentLocationMarker && currentLocation != null) {
+                    val currentMarker = Marker(mapView).apply {
+                        position = currentLocation!!
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Minha localização"
                     }
-                    mapView.overlays.clear()
-                    mapView.overlays.add(marker)
+                    mapView.overlays.add(currentMarker)
                 }
             }
         )
 
-        // Botão para mostrar localização atual
+        // Botão para mostrar marcador da localização atual
         Button(
             onClick = {
-                if (currentLocation != null) {
-                    Toast.makeText(
-                        context,
-                        "Localização atual: ${currentLocation?.latitude}, ${currentLocation?.longitude}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
-                }
+                showCurrentLocationMarker = true
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
