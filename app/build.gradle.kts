@@ -104,5 +104,8 @@ dependencies {
 
     implementation("org.osmdroid:osmdroid-android:6.1.12") // Check for the latest version
 
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+
 
 }
