@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -38,15 +39,16 @@ fun Map(
     db: FirebaseDatabase,
     userName: String
 ) {
-    // Reference to the user's friends in Firebase
-    val userPositionRef = db.reference.child("UserPosition")
+    // References to the user's data and portals in Firebase
+    val userPositionRef = db.reference.child("UserPosition").child(userName)
+    val portalPositionRef = db.reference.child("Portals")
 
     // Configure OSMDroid
     Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
 
-    // Estado para armazenar localização atual e marcadores do Firebase
+    // Estado para armazenar localização atual e marcadores
     var currentLocation by remember { mutableStateOf<GeoPoint?>(null) }
-    var firebaseMarkers by remember { mutableStateOf<List<Pair<String, GeoPoint>>>(emptyList()) }
+    var portalMarkers by remember { mutableStateOf<List<GeoPoint>>(emptyList()) }
     var hasLocationPermission by remember { mutableStateOf(false) }
 
     // Inicializar o LocationManager
@@ -79,6 +81,7 @@ fun Map(
                     permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
             if (hasLocationPermission) {
                 startLocationUpdates(locationManager, locationListener, context)
+                saveCurrentLocation(userPositionRef, currentLocation)
             } else {
                 Toast.makeText(context, "Permissões de localização necessárias", Toast.LENGTH_SHORT).show()
             }
@@ -107,21 +110,21 @@ fun Map(
             )
         } else {
             startLocationUpdates(locationManager, locationListener, context)
+            saveCurrentLocation(userPositionRef, currentLocation)
         }
 
-        // Recuperar marcadores existentes do Firebase
-        userPositionRef.get().addOnSuccessListener { snapshot ->
-            val markers = snapshot.children.mapNotNull { child ->
+        // Recuperar marcadores de portais existentes do Firebase
+        portalPositionRef.get().addOnSuccessListener { snapshot ->
+            val portals = snapshot.children.mapNotNull { child ->
                 val latitude = child.child("latitude").getValue(Double::class.java)
                 val longitude = child.child("longitude").getValue(Double::class.java)
-                val key = child.key
-                if (latitude != null && longitude != null && key != null) {
-                    key to GeoPoint(latitude, longitude)
+                if (latitude != null && longitude != null) {
+                    GeoPoint(latitude, longitude)
                 } else null
             }
-            firebaseMarkers = markers
+            portalMarkers = portals
         }.addOnFailureListener {
-            Toast.makeText(context, "Erro ao carregar dados do Firebase", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Erro ao carregar portais do Firebase", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -141,44 +144,34 @@ fun Map(
                     mapView.controller.setCenter(location)
                 }
 
-                // Adicionar marcadores do Firebase
+                // Adicionar marcadores de portais
                 mapView.overlays.clear()
-                firebaseMarkers.forEach { (_, geoPoint) ->
+                portalMarkers.forEach { portal ->
                     val marker = Marker(mapView).apply {
-                        position = geoPoint
+                        position = portal
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Amigo"
-                    }
-                    mapView.overlays.add(marker)
-                }
-
-                // Adicionar marcador da localização atual
-                currentLocation?.let { location ->
-                    val marker = Marker(mapView).apply {
-                        position = location
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Minha localização"
+                        title = "Portal"
                     }
                     mapView.overlays.add(marker)
                 }
             }
         )
 
-        // Botão para salvar localização atual no Firebase
+        // Botão para salvar posição do portal no Firebase
         Button(
             onClick = {
                 currentLocation?.let { location ->
-                    val locationMap = mapOf(
+                    val portalMap = mapOf(
                         "latitude" to location.latitude,
                         "longitude" to location.longitude
                     )
-                    userPositionRef.child(userName).setValue(locationMap)
+                    portalPositionRef.push().setValue(portalMap)
                         .addOnSuccessListener {
-                            Toast.makeText(context, "Localização salva no Firebase", Toast.LENGTH_SHORT).show()
-                            firebaseMarkers = firebaseMarkers + (userName to location)
+                            Toast.makeText(context, "Portal salvo no Firebase", Toast.LENGTH_SHORT).show()
+                            portalMarkers = portalMarkers + location
                         }
                         .addOnFailureListener {
-                            Toast.makeText(context, "Falha ao salvar localização", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
                         }
                 } ?: Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
             },
@@ -186,7 +179,7 @@ fun Map(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            Text("Salvar Minha Localização")
+            Text("Salvar Portal")
         }
 
         // Botão para voltar à tela inicial
@@ -196,6 +189,26 @@ fun Map(
         ) {
             Text("Home")
         }
+    }
+}
+
+// Função para salvar a localização atual no Firebase
+private fun saveCurrentLocation(
+    userPositionRef: DatabaseReference,
+    currentLocation: GeoPoint?
+) {
+    currentLocation?.let { location ->
+        val locationMap = mapOf(
+            "latitude" to location.latitude,
+            "longitude" to location.longitude
+        )
+        userPositionRef.setValue(locationMap)
+            .addOnSuccessListener {
+                println("Localização atual salva no Firebase.")
+            }
+            .addOnFailureListener {
+                println("Falha ao salvar localização atual no Firebase.")
+            }
     }
 }
 
