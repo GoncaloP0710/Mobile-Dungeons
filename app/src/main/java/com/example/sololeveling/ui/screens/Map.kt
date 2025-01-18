@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.google.firebase.database.FirebaseDatabase
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -33,8 +34,14 @@ private const val LOCATION_REFRESH_DISTANCE = 500f // 500 metros para atualizar
 fun Map(
     navController: NavController,
     id: Int,
-    context: Context
+    context: Context,
+    db: FirebaseDatabase,
+    userName: String
 ) {
+
+    // Reference to the user's friends in Firebase
+    val userPositionRef = db.reference.child("UserPosition").child(userName)
+
     // Configure OSMDroid
     Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
 
@@ -52,6 +59,18 @@ fun Map(
         object : LocationListener {
             override fun onLocationChanged(location: Location) {
                 currentLocation = GeoPoint(location.latitude, location.longitude)
+                // Write the location to Firebase
+                val locationMap = mapOf(
+                    "latitude" to currentLocation!!.latitude,
+                    "longitude" to currentLocation!!.longitude
+                )
+                userPositionRef.setValue(locationMap)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Location updated to Firebase", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Failed to update location", Toast.LENGTH_SHORT).show()
+                    }
             }
 
             override fun onProviderEnabled(provider: String) {
