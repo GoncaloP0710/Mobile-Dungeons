@@ -103,10 +103,10 @@ fun Guild(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display the list of friend requests
+        // Display the list of friend requests ---------------------------------------------------
         Text("Friend Requests:")
         LazyColumn {
-            items(friendRequests) { request ->
+            items(friendRequests.map { it.removeSuffix("@n") }) { request -> // Remove "@n" suffix here
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -118,7 +118,7 @@ fun Guild(
                         val requestRef = db.reference.child("FriendRequests").child(userName)
                         requestRef.get().addOnSuccessListener { snapshot ->
                             val requests = snapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
-                            val updatedRequests = requests.filter { it != request }
+                            val updatedRequests = requests.filter { it != "$request@n" } // Remove original request with "@n"
                             requestRef.setValue(updatedRequests)
 
                             // Add to both users' friend lists
@@ -141,9 +141,10 @@ fun Guild(
             }
         }
 
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Add Friend Request Section
+        // Add Friend Request Section ---------------------------------------------------
         Text("Send Friend Request:")
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -178,7 +179,7 @@ fun Guild(
                                     if (existingRequests.contains(userName)) {
                                         Log.d("FriendRequest", "Friend request already exists.")
                                     } else {
-                                        val updatedRequests = existingRequests + userName
+                                        val updatedRequests = existingRequests + (userName + "@n")
                                         friendRequestsRef.setValue(updatedRequests)
                                             .addOnSuccessListener {
                                                 Log.d("FriendRequest", "Friend request sent to $friendRequestName")
@@ -198,27 +199,6 @@ fun Guild(
             }
         }
     }
-
-    val showDialog = remember { mutableStateOf(false) }
-    Button(onClick = { showDialog.value = true }) {
-        Text("Show Notification")
-        NotificationDialog(showDialog)
-    }
-
 }
 
-@Composable
-fun NotificationDialog(showDialog: MutableState<Boolean>) {
-    if (showDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showDialog.value = false },
-            title = { Text(text = "Notification") },
-            text = { Text("This is a notification pop-up!") },
-            confirmButton = {
-                Button(onClick = { showDialog.value = false }) {
-                    Text("OK")
-                }
-            }
-        )
-    }
-}
+

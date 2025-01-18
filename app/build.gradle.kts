@@ -90,6 +90,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.database)
+    testImplementation(libs.junit.junit)
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")

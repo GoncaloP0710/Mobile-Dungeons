@@ -220,9 +220,19 @@ fun ListenForFriendRequestsScreen(db: FirebaseDatabase, userName: String) {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 // New friend request detected
                 val requestName = snapshot.getValue(String::class.java)
-                if (requestName != null) {
-                    newRequestName = requestName
+                if (requestName != null && requestName.endsWith("@n")) {
+                    // Update newRequestName for the UI
+                    newRequestName = requestName.removeSuffix("@n")
                     showDialog.value = true
+
+                    // Remove "@n" from the database
+                    snapshot.ref.setValue(newRequestName)
+                        .addOnSuccessListener {
+                            Log.d("FirebaseUpdate", "Successfully removed '@n' from $requestName")
+                        }
+                        .addOnFailureListener {
+                            Log.e("FirebaseUpdateError", it.message ?: "Error removing '@n'")
+                        }
                 }
             }
 
@@ -243,23 +253,13 @@ fun ListenForFriendRequestsScreen(db: FirebaseDatabase, userName: String) {
         }
     }
 
+
     // Show Notification Dialog when a new friend request arrives
     if (showDialog.value) {
         NotificationDialog(
             showDialog = showDialog,
             name = newRequestName
         )
-    }
-
-    // Example content
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Listening for new friend requests...")
     }
 }
 
