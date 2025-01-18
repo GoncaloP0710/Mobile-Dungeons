@@ -6,4 +6,5 @@ sealed class Screens(val route: String) {
     object Storage : Screens("storage_screen/{id}")
     object Map : Screens("map_screen/{id}")
     object Guild : Screens("guild_screen/{id}")
+    object Portal : Screens("portal_screen/{id}")
 }

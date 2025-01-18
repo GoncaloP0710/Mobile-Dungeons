@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -18,6 +20,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -26,13 +29,16 @@ import com.example.sololeveling.R
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     id: Int,
-    db: FirebaseDatabase
+    db: FirebaseDatabase,
+    notlogged: Boolean = true
 ) {
-    var showDialog by rememberSaveable { mutableStateOf(true) }
+    var showDialog by rememberSaveable { mutableStateOf(notlogged) }
     var username by rememberSaveable { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoginSuccessful by remember { mutableStateOf(false) }
@@ -92,16 +98,28 @@ fun HomeScreen(
                     OutlinedTextField(
                         value = username,
                         onValueChange = { username = it },
-                        label = { Text("Username") },
+                        label = { Text("Username", color = Color.White) },
                         modifier = Modifier.fillMaxWidth(),
+                        textStyle = TextStyle(color = Color.White),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            cursorColor = Color.White // Optionally, change the cursor color
+                        ),
                     )
 
                     // Password input
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Password") },
+                        label = { Text("Password", color = Color.White) },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        textStyle = TextStyle(color = Color.White),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            cursorColor = Color.White // Optionally, change the cursor color
+                        ),
                         visualTransformation = PasswordVisualTransformation()
                     )
 
@@ -169,6 +187,10 @@ fun HomeScreen(
 
                 Button(onClick = { navController.navigate("guild_screen/$id") }) {
                     Text("Guild")
+                }
+
+                Button(onClick = { navController.navigate("portal_screen/$id") }) {
+                    Text("Portal")
                 }
             }
         }

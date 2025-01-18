@@ -10,6 +10,7 @@ import com.example.sololeveling.ui.screens.Dailies
 import com.example.sololeveling.ui.screens.Guild
 import com.example.sololeveling.ui.screens.HomeScreen
 import com.example.sololeveling.ui.screens.Map
+import com.example.sololeveling.ui.screens.Portal
 import com.example.sololeveling.ui.screens.Storage
 import com.google.firebase.database.FirebaseDatabase
 
@@ -18,14 +19,19 @@ import com.google.firebase.database.FirebaseDatabase
 fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route,
+        startDestination = Screens.HomeScreen.route+"?id=6",
     ) {
         // Home Screen
         composable(
             route = Screens.HomeScreen.route + "?id={id}"
         ) { navBackStack ->
-            val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            HomeScreen(navController = navController, id = id, db)
+            var id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull()?:1
+            var Notlogged: Boolean = false
+            if(id == 6){
+                Notlogged = true
+                id = 5
+            }
+            HomeScreen(navController = navController, id = id, db, Notlogged)
         }
 
         // Storage
@@ -66,6 +72,14 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
             Map(navController = navController, id = id, context = LocalContext.current)
+        }
+
+        //Portal
+        composable(
+            route = Screens.Portal.route + "?id={id}"
+        ) { navBackStack ->
+            val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
+            Portal(navController = navController, id = id, context = context)
         }
     }
 }

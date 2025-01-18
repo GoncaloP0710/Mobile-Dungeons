@@ -93,52 +93,37 @@ fun Dailies(
         }
     }
 
-    // Image as background
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Scaffold(
+        topBar = {
+            // You can add a top bar if necessary
+            Button(onClick = { navController.navigate("home_screen/$id") }) {
+                Text("Home")
+            }
+        },
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Display Magnetic Field
+                measureMagneticField(context) { magneticField = it }
+                Text(text = "Magnetic Field: $magneticField µT")
 
-        Image(
-            painter = painterResource(id = R.drawable.huntersguildgate),
-            contentDescription = "Background Image",
-            modifier = Modifier
-                .fillMaxSize(), // Make the image fill the entire screen
-            contentScale = ContentScale.Crop // Ensure the image covers the entire area
-        )
 
-        Scaffold(
-            topBar = {
-                // You can add a top bar if necessary
-            },
-            content = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Display Magnetic Field
-                    Text(text = "Magnetic Field: $magneticField µT")
-                    Button(onClick = { measureMagneticField(context) { magneticField = it } }) {
-                        Text("Scan Portal")
-                    }
+                // Display Ambient Temperature
+                measureAmbientTemperature(context) { ambientTemperature = it }
+                Text(text = "Ambient Temperature: $ambientTemperature °C")
 
-                    // Display Ambient Temperature
-                    Text(text = "Ambient Temperature: $ambientTemperature °C")
-                    Button(onClick = {
-                        measureAmbientTemperature(context) {
-                            ambientTemperature = it
-                        }
-                    }) {
-                        Text("Measure Temperature")
-                    }
 
-                    // Display Pressure
-                    Text(text = "Pressure: $pressure hPa")
-                    Button(onClick = { measurePressure(context) { pressure = it } }) {
-                        Text("Measure Pressure")
-                    }
+                // Display Pressure
+                measurePressure(context) { pressure = it }
+                Text(text = "Pressure: $pressure hPa")
+                Button(onClick = { measurePressure(context) { pressure = it } }) {
+                    Text("Measure Pressure")
+                }
 
                     // Humidity
                     Text(text = "Humidity: $humidity %")

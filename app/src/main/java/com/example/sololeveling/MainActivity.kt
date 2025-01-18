@@ -32,6 +32,6 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun SoloLevelingApp() {
-    val id = 5
+    val id = 0
     rememberNavController().navigate("home_screen/$id")
 }

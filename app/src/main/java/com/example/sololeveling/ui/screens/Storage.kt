@@ -72,6 +72,7 @@ fun Storage(
         modifier = Modifier.fillMaxSize()
     ) {
 
+
         Image(
             painter = painterResource(id = R.drawable.huntersguildgate),
             contentDescription = "Background Image",
@@ -79,7 +80,9 @@ fun Storage(
                 .fillMaxSize(), // Make the image fill the entire screen
             contentScale = ContentScale.Crop // Ensure the image covers the entire area
         )
-
+        Button(onClick = { navController.navigate("home_screen/$id") }) {
+            Text("Home")
+        }
 
         Column(
             modifier = Modifier
