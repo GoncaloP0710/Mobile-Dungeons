@@ -104,18 +104,17 @@ fun Dailies(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Display Magnetic Field
+                measureMagneticField(context) { magneticField = it }
                 Text(text = "Magnetic Field: $magneticField µT")
-                Button(onClick = { measureMagneticField(context) { magneticField = it } }) {
-                    Text("Scan Portal")
-                }
+
 
                 // Display Ambient Temperature
+                measureAmbientTemperature(context) { ambientTemperature = it }
                 Text(text = "Ambient Temperature: $ambientTemperature °C")
-                Button(onClick = { measureAmbientTemperature(context) { ambientTemperature = it } }) {
-                    Text("Measure Temperature")
-                }
+
 
                 // Display Pressure
+                measurePressure(context) { pressure = it }
                 Text(text = "Pressure: $pressure hPa")
                 Button(onClick = { measurePressure(context) { pressure = it } }) {
                     Text("Measure Pressure")

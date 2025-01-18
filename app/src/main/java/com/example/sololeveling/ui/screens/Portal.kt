@@ -46,11 +46,17 @@ fun Portal(
 ){
     var magneticField by remember { mutableDoubleStateOf(0.0) }
     var wait by remember { mutableStateOf(true) }
-    
+    var scanning_string by remember { mutableStateOf("Scanning") }
 
-    val timer = object: CountDownTimer(2000, 100) {
+    val timer = object: CountDownTimer(5000, 500) {
         override fun onTick(millisUntilFinished: Long) {
-
+            when(scanning_string){
+                "Scanning...." -> scanning_string = "Scanning"
+                "Scanning..." -> scanning_string = "Scanning...."
+                "Scanning.." -> scanning_string = "Scanning..."
+                "Scanning." -> scanning_string = "Scanning.."
+                "Scanning" -> scanning_string = "Scanning."
+            }
         }
 
         override fun onFinish() {wait = false}
@@ -72,57 +78,58 @@ fun Portal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 if(wait){
-                    Text("Scanning...")
+                    Text(scanning_string)
                 }else{
                     measureMagneticField(context) { magneticField = it }
                     when(magneticField){
-                        in -100.0 .. -67.0 -> Text(text="E rank",
+                        in 0.0 .. 33.0 -> Text(text="E rank $magneticField",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                    colors = listOf(Color(0xFF808080), Color(0xFFB0C4DE)) // Gradient colors
                                 )))
 
-                        in -67.0 .. -34.0 -> Text(text="D rank",
+                        in 33.0 .. 66.0 -> Text(text="D rank $magneticField",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                    colors = listOf(Color(0xFF1E90FF), Color(0xFF808080)) // Gradient colors
                                 )))
 
-                        in -34.0 .. 0.0 -> Text(text="C rank",
+                        in 66.0 .. 100.0 -> Text(text="C rank $magneticField",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                    colors = listOf(Color(0xFF32CD32), Color(0xFF1E90FF)) // Gradient colors
                                 )))
 
-                        in 0.0 .. 33.0 -> Text(text="B rank",
+                        in 100.0 .. 133.0 -> Text(text="B rank $magneticField",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                    colors = listOf(Color(0xFFFFD700), Color(0xFF32CD32)) // Gradient colors
                                 )))
 
-                        in 33.0 .. 66.0 -> Text(text="A rank",
+                        in 133.0 .. 166.0 -> Text(text="A rank $magneticField",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                    colors = listOf(Color(0xFFFFA500), Color(0xFFFFD700)) // Gradient colors
                                 )))
 
-                        in 66.0 .. 100.0 -> Text(text="S rank",
+                        in 166.0 .. 200.0 -> Text(text="S rank $magneticField",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
                                 brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFff6f61), Color(0xFF6a1b9a)) // Gradient colors
+                                    colors = listOf(Color(0xFFFFD700), Color(0xFFFF4500)) // Gradient colors
                                 )))
+
 
                         else -> Text("Erro: + $magneticField")
                     }
