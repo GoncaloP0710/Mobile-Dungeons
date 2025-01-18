@@ -204,16 +204,19 @@ private fun saveCurrentLocation(
     currentLocation: GeoPoint?
 ) {
     currentLocation?.let { location ->
+        // Criar um mapa para atualizar apenas a localização
         val locationMap = mapOf(
             "latitude" to location.latitude,
             "longitude" to location.longitude
         )
-        userPositionRef.setValue(locationMap)
+
+        // Usar updateChildren para atualizar apenas a localização
+        userPositionRef.updateChildren(locationMap)
             .addOnSuccessListener {
-                println("Localização atual salva no Firebase.")
+                println("Localização atualizada no Firebase.")
             }
             .addOnFailureListener {
-                println("Falha ao salvar localização atual no Firebase.")
+                println("Falha ao atualizar localização no Firebase: ${it.message}")
             }
     }
 }
