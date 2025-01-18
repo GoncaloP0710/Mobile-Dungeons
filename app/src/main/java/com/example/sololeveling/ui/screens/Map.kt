@@ -164,43 +164,46 @@ fun Map(
             },
             modifier = Modifier.fillMaxSize(),
             update = { mapView ->
-                // Limpa os overlays antes de adicionar novamente
-                mapView.overlays.clear()
+                mapView?.let { mapViewSafe -> // Operações apenas se o MapView não for null
+                    // Limpa os overlays antes de adicionar novamente
+                    mapViewSafe.overlays.clear()
 
-                // Adiciona marcadores da base de dados
-                userPositionRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        for (child in snapshot.children) {
-                            val latitude = child.child("latitude").getValue(Double::class.java)
-                            val longitude = child.child("longitude").getValue(Double::class.java)
-                            val name = child.key ?: "Unknown"
-                            if (latitude != null && longitude != null) {
-                                val marker = Marker(mapView).apply {
-                                    position = GeoPoint(latitude, longitude)
-                                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                                    title = name
+                    // Adiciona marcadores da base de dados
+                    userPositionRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            for (child in snapshot.children) {
+                                val latitude = child.child("latitude").getValue(Double::class.java)
+                                val longitude = child.child("longitude").getValue(Double::class.java)
+                                val name = child.key ?: "Unknown"
+                                if (latitude != null && longitude != null) {
+                                    val marker = Marker(mapViewSafe).apply {
+                                        position = GeoPoint(latitude, longitude)
+                                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                        title = name
+                                    }
+                                    mapViewSafe.overlays.add(marker)
                                 }
-                                mapView.overlays.add(marker)
                             }
                         }
-                    }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(context, "Erro ao carregar marcadores: ${error.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
+                        override fun onCancelled(error: DatabaseError) {
+                            Toast.makeText(context, "Erro ao carregar marcadores: ${error.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
 
-                // Adiciona marcador da localização atual, se ativado
-                if (showCurrentLocationMarker && currentLocation != null) {
-                    val currentMarker = Marker(mapView).apply {
-                        position = currentLocation!!
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Minha localização"
+                    // Adiciona marcador da localização atual, se ativado
+                    if (showCurrentLocationMarker && currentLocation != null) {
+                        val currentMarker = Marker(mapViewSafe).apply {
+                            position = currentLocation!!
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            title = "Minha localização"
+                        }
+                        mapViewSafe.overlays.add(currentMarker)
                     }
-                    mapView.overlays.add(currentMarker)
                 }
             }
         )
+
 
         // Botão para mostrar marcador da localização atual
         Button(
