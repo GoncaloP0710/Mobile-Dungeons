@@ -60,10 +60,17 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
 
         // Guild
         composable(
-            route = Screens.Guild.route + "?id={id}"
+            route = Screens.Guild.route + "?id={id}&username={username}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Guild(navController = navController, id = id)
+            val name: String? = navBackStack.arguments?.getString("username")
+            if (name != null) {
+                println("name is not null")
+                Guild(navController = navController, id = id, db, name)
+            } else {
+                println("id: $id")
+                println("name is null")
+            }
         }
 
         // Map

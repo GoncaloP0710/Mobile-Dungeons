@@ -28,6 +28,11 @@ import androidx.navigation.NavController
 import com.example.sololeveling.R
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
+import android.util.Log
+import androidx.compose.material3.AlertDialog
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -185,7 +190,7 @@ fun HomeScreen(
                     Text("Dailies")
                 }
 
-                Button(onClick = { navController.navigate("guild_screen/$id") }) {
+                Button(onClick = { navController.navigate("guild_screen/$id?username=$username") }) {
                     Text("Guild")
                 }
 
@@ -219,4 +224,67 @@ fun loginUser(
     }.addOnFailureListener {
         onError("Login failed. Please try again.")
     }
+}
+
+@Composable
+fun ListenForFriendRequestsScreen(db: FirebaseDatabase, userName: String) {
+    val showDialog = remember { mutableStateOf(false) }
+    var newRequestName by remember { mutableStateOf("") }
+    // Reference to the FriendRequests node for the current user
+    val friendRequestsRef = db.reference.child("FriendRequests").child(userName)
+    // Set up a listener for new friend requests
+    DisposableEffect(friendRequestsRef) {
+        val listener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                // New friend request detected
+                val requestName = snapshot.getValue(String::class.java)
+                if (requestName != null && requestName.endsWith("@n")) {
+                    // Update newRequestName for the UI
+                    newRequestName = requestName.removeSuffix("@n")
+                    showDialog.value = true
+                    // Remove "@n" from the database
+                    snapshot.ref.setValue(newRequestName)
+                        .addOnSuccessListener {
+                            Log.d("FirebaseUpdate", "Successfully removed '@n' from $requestName")
+                        }
+                        .addOnFailureListener {
+                            Log.e("FirebaseUpdateError", it.message ?: "Error removing '@n'")
+                        }
+                }
+            }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", error.message)
+            }
+        }
+        // Attach listener
+        friendRequestsRef.addChildEventListener(listener)
+        // Clean up when Composable is disposed
+        onDispose {
+            friendRequestsRef.removeEventListener(listener)
+        }
+    }
+    // Show Notification Dialog when a new friend request arrives
+    if (showDialog.value) {
+        NotificationDialog(
+            showDialog = showDialog,
+            name = newRequestName
+        )
+    }
+}
+
+@Composable
+fun NotificationDialog(showDialog: MutableState<Boolean>, name: String) {
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text("New Friend Request") },
+        text = { Text("You have a new friend request from $name!") },
+        confirmButton = {
+            Button(onClick = { showDialog.value = false }) {
+                Text("Dismiss")
+            }
+        }
+    )
 }
