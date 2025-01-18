@@ -109,8 +109,14 @@ fun Map(
                 )
             )
         } else {
+            // Se as permissões estiverem concedidas, tentamos obter a última localização conhecida
+            val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            if (lastKnownLocation != null) {
+                currentLocation = GeoPoint(lastKnownLocation.latitude, lastKnownLocation.longitude)
+                saveCurrentLocation(userPositionRef, currentLocation)
+            }
             startLocationUpdates(locationManager, locationListener, context)
-            saveCurrentLocation(userPositionRef, currentLocation)
+
         }
 
         // Recuperar marcadores de portais existentes do Firebase
