@@ -154,7 +154,6 @@ fun Dailies(
         )
     }
 
-}
 
 @Composable
 fun MonsterCard(monster: MonsterDetails) {
