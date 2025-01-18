@@ -138,11 +138,7 @@ fun Storage(
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
-            Text(
-                text = "Power Level: $powerLevel",
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-            )
+            PowerLevel(powerLevel)
             Spacer(modifier = Modifier.height(2.dp)) // Adjusted spacing
 
             if(wait && scanning){
@@ -243,4 +239,73 @@ fun Storage(
     //Button(onClick = { navController.navigate("home_screen/$id") }) {
     //    Text("Home")
     //}
+
+}
+@Composable
+fun PowerLevel(power : String){
+    Text(
+        text = "Power Level: ",
+        fontSize = 20.sp,
+        textAlign = TextAlign.Center,
+    )
+
+    when(power){
+        "E" -> Text(text="E rank",
+            style = TextStyle(
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFF808080), Color(0xFFB0C4DE)) // Gradient colors
+                ))
+        )
+
+        "D" -> Text(text="D rank",
+            style = TextStyle(
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFF1E90FF), Color(0xFF808080)) // Gradient colors
+                ))
+        )
+
+        "C" -> Text(text="C rank",
+            style = TextStyle(
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFF32CD32), Color(0xFF1E90FF)) // Gradient colors
+                ))
+        )
+
+        "B" -> Text(text="B rank",
+            style = TextStyle(
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFFFFD700), Color(0xFF32CD32)) // Gradient colors
+                ))
+        )
+
+        "A" -> Text(text="A rank",
+            style = TextStyle(
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFFFFA500), Color(0xFFFFD700)) // Gradient colors
+                ))
+        )
+
+        "S" -> Text(text="S rank",
+            style = TextStyle(
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFFFFD700), Color(0xFFFF4500)) // Gradient colors
+                ))
+        )
+
+
+        else -> Text("-")
+    }
+
 }
