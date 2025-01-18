@@ -182,7 +182,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { navController.navigate("map_screen/$id") }) {
+                Button(onClick = { navController.navigate("map_screen/$id?username=$username") }) {
                     Text("Map")
                 }
 

@@ -75,10 +75,17 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
 
         // Map
         composable(
-            route = Screens.Map.route + "?id={id}"
+            route = Screens.Map.route + "?id={id}&username={username}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Map(navController = navController, id = id, context = LocalContext.current)
+            val name: String? = navBackStack.arguments?.getString("username")
+            if (name != null) {
+                println("name is not null")
+                Map(navController = navController, id = id, context = LocalContext.current, db, name)
+            } else {
+                println("id: $id")
+                println("name is null")
+            }
         }
 
         //Portal
