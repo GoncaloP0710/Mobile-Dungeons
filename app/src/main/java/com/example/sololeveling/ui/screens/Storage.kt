@@ -52,7 +52,7 @@ fun Storage(
     context: Context // Pass context to access SensorManager
 ) {
 
-    var userName2 =userName
+    var userName2 by remember { mutableStateOf(userName) }
     // Use state to hold values
     var firstTime by remember { mutableStateOf(0) }
     var age by remember { mutableStateOf(0) }
@@ -126,40 +126,26 @@ fun Storage(
 
             Spacer(modifier = Modifier.height(40.dp)) // Space between image and text
 
-            if(edit){
-                OutlinedTextField(
-                    value = userName2,
-                    onValueChange = { userName2 = it },
-                    label = { Text("Name", color = Color.White) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.White),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White // Optionally, change the cursor color
-                    ),
-                )
-            }else{
+
                 // Place text below the image
                 Text(
-                    text = "Name: $userName2",
+                    text = "$userName2",
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                 )
-            }
 
             Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
             if(edit){
                 OutlinedTextField(
                     value = age2,
                     onValueChange = { age2 = it },
-                    label = { Text("Age", color = Color.White) },
+                    label = { Text("Age", color = Color.Black) },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.White),
+                    textStyle = TextStyle(color = Color.Black),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White // Optionally, change the cursor color
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        cursorColor = Color.Black // Optionally, change the cursor color
                     ),
                 )
                 age = age2.toInt()
@@ -176,13 +162,13 @@ fun Storage(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description", color = Color.White) },
+                    label = { Text("Description", color = Color.Black) },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.White),
+                    textStyle = TextStyle(color = Color.Black),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White // Optionally, change the cursor color
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        cursorColor = Color.Black // Optionally, change the cursor color
                     ),
                 )
             }else{
@@ -194,26 +180,13 @@ fun Storage(
             }
 
             Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
-            if(edit){
-                OutlinedTextField(
-                    value = dungeonsSpotted2,
-                    onValueChange = { dungeonsSpotted2 = it },
-                    label = { Text("Dungeons Spotted", color = Color.White) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.White),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White // Optionally, change the cursor color
-                    ),
-                )
-            }else{
+
                 Text(
-                    text = "Dungeons Spotted: $dungeonsSpotted",
+                    text = "Dungeons Spotted: $dungeonsSpotted2",
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                 )
-            }
+            
             if(!edit){
                 Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
                 PowerLevel(powerLevel)
@@ -316,7 +289,19 @@ fun Storage(
 
             }
             if(edit){
-                Button(onClick = {edit = false}) {
+                Button(onClick = {
+                    edit = false
+                    val updateInfo = mapOf(
+                        "Age" to age,
+                        "Name" to userName2,
+                        "Description" to description,
+                        "DungeonsSpotted" to dungeonsSpotted2.toInt(),
+                        "PowerLevel" to powerLevel
+                    )
+                    usersRef.child(userName).updateChildren(updateInfo)
+                        .addOnSuccessListener { /* Handle success if needed */ }
+                        .addOnFailureListener { /* Handle error if needed */ }
+                }) {
                     Text("Save")
                 }
             }else{
