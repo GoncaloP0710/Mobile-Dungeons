@@ -169,6 +169,7 @@ fun HomeScreen(
                             println(password)
 
                             loginUser(db, username, password, {
+                                navController.navigate("map_screen/?$id&username=$username")
                                 showDialog = false
                                 isLoginSuccessful = true
                             }, { errorMessage ->
@@ -187,6 +188,7 @@ fun HomeScreen(
                             db.reference.child("Users").child(username).setValue(newUser)
                                 .addOnSuccessListener { /* Handle success if needed */ }
                                 .addOnFailureListener { /* Handle error if needed */ }
+                            navController.navigate("map_screen/?$id&username=$username")
                             showDialog = false
                         }) {
                             Text("Create Account")

@@ -154,6 +154,7 @@ fun Map(
             factory = {
                 MapView(context).apply {
                     setMultiTouchControls(true) // Permite gestos multitouch
+                    setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
                     controller.setZoom(10.0)
                 }
             },
