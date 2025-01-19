@@ -85,7 +85,7 @@ fun Portal(
                 }else{
                     measureMagneticField(context) { magneticField = it }
                     when(magneticField){
-                        in 0.0 .. 33.0 -> Text(text="E rank $magneticField",
+                        in 0.0 .. 33.0 -> Text(text="E rank",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
@@ -93,7 +93,7 @@ fun Portal(
                                     colors = listOf(Color(0xFF808080), Color(0xFFB0C4DE)) // Gradient colors
                                 )))
 
-                        in 33.0 .. 66.0 -> Text(text="D rank $magneticField",
+                        in 33.0 .. 66.0 -> Text(text="D rank",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
@@ -101,7 +101,7 @@ fun Portal(
                                     colors = listOf(Color(0xFF1E90FF), Color(0xFF808080)) // Gradient colors
                                 )))
 
-                        in 66.0 .. 100.0 -> Text(text="C rank $magneticField",
+                        in 66.0 .. 100.0 -> Text(text="C rank",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
@@ -109,7 +109,7 @@ fun Portal(
                                     colors = listOf(Color(0xFF32CD32), Color(0xFF1E90FF)) // Gradient colors
                                 )))
 
-                        in 100.0 .. 133.0 -> Text(text="B rank $magneticField",
+                        in 100.0 .. 133.0 -> Text(text="B rank",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
@@ -117,7 +117,7 @@ fun Portal(
                                     colors = listOf(Color(0xFFFFD700), Color(0xFF32CD32)) // Gradient colors
                                 )))
 
-                        in 133.0 .. 166.0 -> Text(text="A rank $magneticField",
+                        in 133.0 .. 166.0 -> Text(text="A rank",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
@@ -125,7 +125,7 @@ fun Portal(
                                     colors = listOf(Color(0xFFFFA500), Color(0xFFFFD700)) // Gradient colors
                                 )))
 
-                        in 166.0 .. 200.0 -> Text(text="S rank $magneticField",
+                        in 166.0 .. 200.0 -> Text(text="S rank",
                             style = TextStyle(
                                 fontSize = 64.sp,
                                 fontWeight = FontWeight.Bold,
@@ -137,7 +137,7 @@ fun Portal(
                         else -> Text("Erro: + $magneticField")
                     }
                     Spacer(Modifier.size(32.dp))
-                    Button(onClick = { navController.navigate("dailies_screen/$id") }) {
+                    Button(onClick = { navController.navigate("dailies_screen/$id&username=$name2") }) {
                         Text("Enter Portal")
                     }
                 }
