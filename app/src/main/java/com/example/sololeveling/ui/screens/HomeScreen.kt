@@ -82,7 +82,7 @@ fun HomeScreen(
             Dialog(onDismissRequest = { } ) {
                 Column(
                     modifier = Modifier
-                        .padding(48.dp)
+                        .padding(5.dp)
                         .fillMaxWidth()
                         .background(Color(0xAA000000), RoundedCornerShape(16.dp))
                         .padding(32.dp)
@@ -160,7 +160,6 @@ fun HomeScreen(
                                 .weight(1f)
                                 .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Blue,
                                 contentColor = Color.White // Cor do texto no botão
                             )
                         ) {
@@ -180,7 +179,6 @@ fun HomeScreen(
                                 .weight(1f)
                                 .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Blue,
                                 contentColor = Color.White
                             )
                         ) {
