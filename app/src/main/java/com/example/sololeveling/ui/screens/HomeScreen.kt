@@ -69,7 +69,7 @@ fun HomeScreen(
     var loginErrorMessage by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image
+        // Image Background: Ensure the image fills the screen
         Image(
             painter = painterResource(id = R.drawable.gradient), // Substitua com seu caminho correto da imagem gradient.jpg
             contentDescription = "Background Image",
@@ -78,13 +78,13 @@ fun HomeScreen(
 
         // Login Dialog
         if (showDialog) {
-            Dialog(onDismissRequest = { } ) {
+            Dialog(onDismissRequest = {  }) {
                 Column(
                     modifier = Modifier
-                        .padding(32.dp)
+                        .padding(48.dp)  // Aumenta o padding da Box
                         .fillMaxWidth()
-                        .background(Color(0xAA000000), RoundedCornerShape(16.dp))
-                        .padding(24.dp)
+                        .background(Color(0xAA000000), RoundedCornerShape(16.dp)) // Fundo semi-transparente
+                        .padding(32.dp) // Aumenta o padding interno
                 ) {
                     // Título
                     Text(
@@ -94,7 +94,7 @@ fun HomeScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp)) // Aumenta o espaçamento entre o título e os campos
 
                     // Username input
                     OutlinedTextField(
@@ -137,7 +137,7 @@ fun HomeScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp)) // Aumenta o espaçamento entre os campos e os botões
 
                     // Buttons Row
                     Row(
@@ -157,14 +157,16 @@ fun HomeScreen(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(50.dp),
+                                .height(56.dp), // Aumenta a altura do botão
                             colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF6200EE), // Cor de fundo do botão
                                 contentColor = Color.White // Cor do texto no botão
                             )
                         ) {
                             Text("Login")
                         }
 
+                        // Register Button
                         Button(
                             onClick = {
                                 val newUser = mapOf("Name" to username, "Pass" to password)
@@ -176,9 +178,10 @@ fun HomeScreen(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(50.dp),
+                                .height(56.dp), // Aumenta a altura do botão
                             colors = ButtonDefaults.buttonColors(
-                                contentColor = Color.White
+                                containerColor = Color(0xFF03DAC5), // Cor de fundo do botão
+                                contentColor = Color.White // Cor do texto no botão
                             )
                         ) {
                             Text("Create Account")
@@ -189,6 +192,7 @@ fun HomeScreen(
         }
     }
 }
+
 
 
 
