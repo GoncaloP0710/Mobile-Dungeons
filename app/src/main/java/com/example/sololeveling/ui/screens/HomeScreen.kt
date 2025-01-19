@@ -36,8 +36,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -58,33 +61,40 @@ fun HomeScreen(
     notlogged: Boolean = true,
     user: String = ""
 ) {
-    println("USeR: " + user)
-    var user2 = user
-    if(user == "placeholder"){
-        user2 = ""
-    }
-    println("2: "+user2)
+    var user2 = if (user == "placeholder") "" else user
     var showDialog by rememberSaveable { mutableStateOf(notlogged) }
     var username by rememberSaveable { mutableStateOf(user2) }
     var password by remember { mutableStateOf("") }
     var isLoginSuccessful by remember { mutableStateOf(false) }
     var loginErrorMessage by remember { mutableStateOf("") }
 
-    // Image as background
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Background Image
+        Image(
+            painter = painterResource(id = R.drawable.gradient), // Substitua com seu caminho correto da imagem gradient.jpg
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize().alpha(0.8f) // Diminui a opacidade para não sobrecarregar o texto
+        )
+
         // Login Dialog
-        println("DIALOG")
-        println(username)
         if (showDialog) {
-            Dialog(onDismissRequest = { /* Do nothing to keep it open until valid login */ }) {
+            Dialog(onDismissRequest = { } ) {
                 Column(
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(32.dp)
                         .fillMaxWidth()
-                        .wrapContentSize()
+                        .background(Color(0xAA000000), RoundedCornerShape(16.dp))
+                        .padding(24.dp)
                 ) {
+                    // Título
+                    Text(
+                        text = "Login",
+                        color = Color.White,
+                        style = TextStyle(fontSize = 24.sp),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // Username input
                     OutlinedTextField(
@@ -96,65 +106,81 @@ fun HomeScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.White,
-                            cursorColor = Color.White // Optionally, change the cursor color
+                            cursorColor = Color.White
                         ),
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Password input
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password", color = Color.White) },
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(color = Color.White),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = Color.White,
-                            cursorColor = Color.White // Optionally, change the cursor color
+                            cursorColor = Color.White
                         ),
                         visualTransformation = PasswordVisualTransformation()
                     )
 
                     // Show login error message if any
                     if (loginErrorMessage.isNotEmpty()) {
-                        Text(text = loginErrorMessage, color = Color.Red)
+                        Text(
+                            text = loginErrorMessage,
+                            color = Color.Red,
+                            style = TextStyle(fontSize = 14.sp),
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                    // Buttons in a horizontal row
+                    // Buttons Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         // Login Button
-                        Button(onClick = {
-                            println("LOGIN")
-                            println(username)
-                            println(password)
-
-                            loginUser(db, username, password, {
-                                navController.navigate("map_screen/?$id&username=$username")
-                                showDialog = false
-                                isLoginSuccessful = true
-                            }, { errorMessage ->
-                                loginErrorMessage = errorMessage
-                            })
-                        }) {
+                        Button(
+                            onClick = {
+                                loginUser(db, username, password, {
+                                    navController.navigate("map_screen/?$id&username=$username")
+                                    showDialog = false
+                                    isLoginSuccessful = true
+                                }, { errorMessage ->
+                                    loginErrorMessage = errorMessage
+                                })
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                contentColor = Color.White // Cor do texto no botão
+                            )
+                        ) {
                             Text("Login")
                         }
 
-                        // Register Button
-                        Button(onClick = {
-                            val newUser = mapOf(
-                                "Name" to username,
-                                "Pass" to password
+                        Button(
+                            onClick = {
+                                val newUser = mapOf("Name" to username, "Pass" to password)
+                                db.reference.child("Users").child(username).setValue(newUser)
+                                    .addOnSuccessListener {
+                                        navController.navigate("map_screen/?$id&username=$username")
+                                        showDialog = false
+                                    }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                contentColor = Color.White
                             )
-                            db.reference.child("Users").child(username).setValue(newUser)
-                                .addOnSuccessListener { /* Handle success if needed */ }
-                                .addOnFailureListener { /* Handle error if needed */ }
-                            navController.navigate("map_screen/?$id&username=$username")
-                            showDialog = false
-                        }) {
+                        ) {
                             Text("Create Account")
                         }
                     }
@@ -163,6 +189,8 @@ fun HomeScreen(
         }
     }
 }
+
+
 
 fun loginUser(
     db: FirebaseDatabase,
