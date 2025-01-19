@@ -9,14 +9,19 @@ import android.location.LocationManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
@@ -169,42 +174,52 @@ fun Map(
             }
         )
 
-        // Botão para salvar posição do portal no Firebase
-        Button(
-            onClick = {
-                currentLocation?.let { location ->
-                    val newPortalRef = portalPositionRef.push() // Gera uma nova referência com UID único
-                    val portalUID = newPortalRef.key // Obtém o UID único gerado
-                    val portalMap = mapOf(
-                        "uid" to portalUID, // Adiciona o UID ao mapa
-                        "latitude" to location.latitude,
-                        "longitude" to location.longitude
-                    )
-                    newPortalRef.setValue(portalMap)
-                        .addOnSuccessListener {
-                            Toast.makeText(context, "Portal salvo no Firebase", Toast.LENGTH_SHORT).show()
-                            // Atualiza portalMarkers com o novo par (UID, GeoPoint)
-                            portalMarkers = portalMarkers + (portalUID!! to GeoPoint(location.latitude, location.longitude))
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
-                        }
-                } ?: Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
-            },
+        Box(
             modifier = Modifier
-                .align(Alignment.BottomEnd)
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .background(Color.Black.copy(alpha = 0.5f)) // Semi-transparent background
                 .padding(16.dp)
         ) {
-            Text("Salvar Portal")
-        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$userName") }) {
+                    Text("Friends")
+                }
 
-        // Botão para voltar à tela inicial
-        println("USER3: $userName")
-        Button(
-            onClick = { navController.navigate("home_screen/?$id&username=$userName") },
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("Home")
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") }) {
+                    Text("Map")
+                }
+
+                // Botão para salvar posição do portal no Firebase
+                Button(
+                    onClick = {
+                        currentLocation?.let { location ->
+                            val newPortalRef = portalPositionRef.push() // Gera uma nova referência com UID único
+                            val portalUID = newPortalRef.key // Obtém o UID único gerado
+                            val portalMap = mapOf(
+                                "uid" to portalUID, // Adiciona o UID ao mapa
+                                "latitude" to location.latitude,
+                                "longitude" to location.longitude
+                            )
+                            newPortalRef.setValue(portalMap)
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, "Portal salvo no Firebase", Toast.LENGTH_SHORT).show()
+                                    // Atualiza portalMarkers com o novo par (UID, GeoPoint)
+                                    portalMarkers = portalMarkers + (portalUID!! to GeoPoint(location.latitude, location.longitude))
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
+                                }
+                        } ?: Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Text("Scan Portal")
+                }
+            }
         }
     }
 }
