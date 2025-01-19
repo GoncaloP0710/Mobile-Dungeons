@@ -6,7 +6,10 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,13 +44,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sololeveling.R
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import kotlin.math.sqrt
 
 import okhttp3.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.io.IOException
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.random.Random
+
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 // Data classes
 data class MonsterListResponse(
@@ -69,12 +83,15 @@ data class MonsterDetails(
     @SerializedName("challenge_rating") val challengeRating: Double
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Dailies(
     navController: NavController,
     id: Int,
-    context: Context // Pass context to access SensorManager
+    context: Context, // Pass context to access SensorManager
+    db: FirebaseDatabase,
+    userName: String
 ) {
     var magneticField by remember { mutableDoubleStateOf(0.0) }
     var ambientTemperature by remember { mutableFloatStateOf(0.0F) }
@@ -84,6 +101,12 @@ fun Dailies(
 
     var monsterDetailsList by remember { mutableStateOf<List<MonsterDetails>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+
+    // Reference to the help data in Firebase
+    val userHelpRef = db.reference.child("UserHelp")
+
+    // Reference to the position in Firebase
+    val userPositionRef = db.reference.child("UserPosition")
 
     // Fetch 5 random monsters
     LaunchedEffect(Unit) {
@@ -135,6 +158,13 @@ fun Dailies(
                     Text(text = "Light Level: $lightLevel lx")
                     Button(onClick = { measureLight(context) { lightLevel = it } }) {
                         Text("Measure Light")
+                    }
+
+                    // Check for nearby users and send help request
+                    Button(onClick = {
+                        checkAndRequestHelpFromFirebase(userPositionRef, userHelpRef, userName)
+                    }) {
+                        Text("Check Nearby Users & Send Help Request")
                     }
 
                     if (isLoading) {
@@ -372,4 +402,87 @@ fun fetchMonsterDetails(monsterIndex: String, onResult: (MonsterDetails?) -> Uni
             }
         }
     })
+}
+
+/**
+ * Checks all user positions from Firebase to find nearby users and sends help requests to them.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
+private fun checkAndRequestHelpFromFirebase(
+    userPositionRef: DatabaseReference,
+    userHelpRef: DatabaseReference,
+    userName: String,
+    radius: Double = 500.0 // Define proximity radius in meters
+) {
+    userPositionRef.get().addOnSuccessListener { snapshot ->
+        // Fetch the current user's position
+        val currentUserSnapshot = snapshot.child(userName)
+        val currentLatitude = currentUserSnapshot.child("latitude").getValue(Double::class.java)
+        val currentLongitude = currentUserSnapshot.child("longitude").getValue(Double::class.java)
+
+        if (currentLatitude == null || currentLongitude == null) {
+            Log.e("FirebaseError", "Current user position not found")
+            return@addOnSuccessListener
+        }
+
+        // Iterate through other users to check proximity
+        snapshot.children.forEach { userSnapshot ->
+            val otherUserName = userSnapshot.key ?: return@forEach
+            if (otherUserName == userName) return@forEach // Skip current user
+
+            val otherLatitude = userSnapshot.child("latitude").getValue(Double::class.java)
+            val otherLongitude = userSnapshot.child("longitude").getValue(Double::class.java)
+
+            if (otherLatitude != null && otherLongitude != null) {
+                val distance = calculateDistance(
+                    currentLatitude,
+                    currentLongitude,
+                    otherLatitude,
+                    otherLongitude
+                )
+
+                if (distance <= radius) {
+                    // Send help request to this user
+                    val timestamp = System.currentTimeMillis()
+                    userHelpRef.child(otherUserName).child(userName).setValue(formatTimestamp(timestamp))
+                }
+            }
+        }
+    }.addOnFailureListener {
+        Log.e("FirebaseError", "Failed to fetch user positions: ${it.message}")
+    }
+}
+
+/**
+ * Calculates the distance between two geographical points using the Haversine formula.
+ */
+private fun calculateDistance(
+    lat1: Double, lon1: Double,
+    lat2: Double, lon2: Double
+): Double {
+    val earthRadius = 6371000.0 // Radius of Earth in meters
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLon = Math.toRadians(lon2 - lon1)
+
+    val a = sin(dLat / 2) * sin(dLat / 2) +
+            cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+            sin(dLon / 2) * sin(dLon / 2)
+
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return earthRadius * c
+}
+
+fun formatTimestamp(timestamp: Long): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+            .withZone(ZoneId.systemDefault())
+        formatter.format(instant)
+    } else {
+        // For older Android versions, use SimpleDateFormat
+        val date = Date(timestamp)
+        val simpleDateFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        simpleDateFormat.format(date)
+    }
 }

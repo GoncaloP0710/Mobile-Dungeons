@@ -1,6 +1,8 @@
 package com.example.sololeveling.navigation
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -15,6 +17,7 @@ import com.example.sololeveling.ui.screens.Storage
 import com.google.firebase.database.FirebaseDatabase
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
@@ -49,13 +52,19 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
             }
         }
 
-
         // Dailies
         composable(
-            route = Screens.Dailies.route + "?id={id}"
+            route = Screens.Dailies.route + "?id={id}&username={username}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Dailies(navController = navController, id = id, context = context)
+            val name: String? = navBackStack.arguments?.getString("username")
+            if (name != null) {
+                println("name is not null")
+                Dailies(navController = navController, id = id, context = context, db, name)
+            } else {
+                println("id: $id")
+                println("name is null")
+            }
         }
 
         // Guild
