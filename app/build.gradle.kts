@@ -90,6 +90,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.database)
+    implementation(libs.androidx.material3.android)
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
@@ -105,6 +106,7 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.12") // Check for the latest version
 
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.compose.material3:material3:1.2.0") // Update to the latest stable version
 
 
 
