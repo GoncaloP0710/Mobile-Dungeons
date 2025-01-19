@@ -308,7 +308,7 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
                             helpRequester = requestKey
                             helpRequestTime = requestTime
                             showDialog.value = true
-                            processedRequests.value.add(requestKey)
+                            processedRequests.value.add(requestKey) // Mark request as processed
                         } else {
                             snapshot.ref.removeValue()
                                 .addOnSuccessListener {
@@ -334,12 +334,10 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
 
         onDispose {
             userHelpRef.removeEventListener(listener)
-            showDialog.value = false
-            helpRequester = ""
-            helpRequestTime = ""
         }
     }
 
+    // Show Notification Dialog when a new help request arrives
     if (showDialog.value) {
         HelpNotificationDialog(
             showDialog = showDialog,
@@ -348,6 +346,9 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
         )
     }
 }
+
+
+
 
 @Composable
 fun HelpNotificationDialog(
@@ -365,18 +366,20 @@ fun HelpNotificationDialog(
 
     LaunchedEffect(showDialog.value) {
         if (showDialog.value) {
+            // Vibration
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
             } else {
                 vibrator.vibrate(500)
             }
 
+            // Flashlight toggle
             if (cameraId != null) {
                 try {
-                    repeat(6) {
-                        cameraManager.setTorchMode(cameraId, true)
-                        delay(300)
-                        cameraManager.setTorchMode(cameraId, false)
+                    repeat(6) { // Flash 3 times
+                        cameraManager.setTorchMode(cameraId, true) // Turn on
+                        delay(300) // 300ms
+                        cameraManager.setTorchMode(cameraId, false) // Turn off
                         delay(300)
                     }
                 } catch (e: Exception) {
@@ -384,16 +387,17 @@ fun HelpNotificationDialog(
                 }
             }
         } else if (cameraId != null) {
+            // Ensure flashlight is off
             cameraManager.setTorchMode(cameraId, false)
         }
     }
 
     if (showDialog.value) {
         AlertDialog(
-            onDismissRequest = {
-                showDialog.value = false
+            onDismissRequest = { showDialog.value = false },
+            title = {
+                Text(text = "Help Request")
             },
-            title = { Text(text = "Help Request") },
             text = {
                 Column {
                     Text(text = "User $name is requesting help.")
@@ -419,5 +423,4 @@ fun HelpNotificationDialog(
         )
     }
 }
-
 
