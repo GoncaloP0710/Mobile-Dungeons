@@ -213,8 +213,8 @@ fun Map(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { navController.navigate("guild_screen/?$id&username=$userName") }) {
-                    Text("Friends")
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") }) {
+                    Text("Map")
                 }
 
                 // Botão para salvar posição do portal no Firebase
@@ -243,10 +243,10 @@ fun Map(
                     Text("Scan Portal")
                 }
 
-
-                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") }) {
-                    Text("Map")
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$userName") }) {
+                    Text("Friends")
                 }
+
             }
         }
     }
