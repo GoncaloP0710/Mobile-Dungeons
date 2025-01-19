@@ -296,26 +296,20 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
         val listener = object : ChildEventListener {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                // New help request detected
                 val requestTime = snapshot.getValue(String::class.java)
                 val requestKey = snapshot.key
 
                 if (requestTime != null && requestKey != null) {
                     if (requestKey !in processedRequests.value) {
-                        // Parse the request time from Firebase
                         val requestDateTime = LocalDateTime.parse(requestTime, DateTimeFormatter.ISO_DATE_TIME)
                         val now = LocalDateTime.now()
 
-                        // Check if the request is within the last 5 minutes
                         if (Duration.between(requestDateTime, now).toMinutes() <= 5) {
                             helpRequester = requestKey
                             helpRequestTime = requestTime
                             showDialog.value = true
-
-                            // Mark the request as processed
                             processedRequests.value.add(requestKey)
                         } else {
-                            // Outdated request: Remove from Firebase
                             snapshot.ref.removeValue()
                                 .addOnSuccessListener {
                                     Log.d("FirebaseCleanup", "Discarded outdated help request from $helpRequester")
@@ -336,16 +330,16 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
             }
         }
 
-        // Attach the listener
         userHelpRef.addChildEventListener(listener)
 
-        // Clean up when Composable is disposed
         onDispose {
             userHelpRef.removeEventListener(listener)
+            showDialog.value = false
+            helpRequester = ""
+            helpRequestTime = ""
         }
     }
 
-    // Show Notification Dialog when a new help request arrives
     if (showDialog.value) {
         HelpNotificationDialog(
             showDialog = showDialog,
@@ -354,8 +348,6 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
         )
     }
 }
-
-
 
 @Composable
 fun HelpNotificationDialog(
@@ -373,20 +365,18 @@ fun HelpNotificationDialog(
 
     LaunchedEffect(showDialog.value) {
         if (showDialog.value) {
-            // Vibration
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
             } else {
                 vibrator.vibrate(500)
             }
 
-            // Flashlight toggle
             if (cameraId != null) {
                 try {
-                    repeat(6) { // Flash 3 times
-                        cameraManager.setTorchMode(cameraId, true) // Turn on
-                        delay(300) // 300ms
-                        cameraManager.setTorchMode(cameraId, false) // Turn off
+                    repeat(6) {
+                        cameraManager.setTorchMode(cameraId, true)
+                        delay(300)
+                        cameraManager.setTorchMode(cameraId, false)
                         delay(300)
                     }
                 } catch (e: Exception) {
@@ -394,17 +384,16 @@ fun HelpNotificationDialog(
                 }
             }
         } else if (cameraId != null) {
-            // Ensure flashlight is off
             cameraManager.setTorchMode(cameraId, false)
         }
     }
 
     if (showDialog.value) {
         AlertDialog(
-            onDismissRequest = { showDialog.value = false },
-            title = {
-                Text(text = "Help Request")
+            onDismissRequest = {
+                showDialog.value = false
             },
+            title = { Text(text = "Help Request") },
             text = {
                 Column {
                     Text(text = "User $name is requesting help.")
@@ -430,4 +419,5 @@ fun HelpNotificationDialog(
         )
     }
 }
+
 
