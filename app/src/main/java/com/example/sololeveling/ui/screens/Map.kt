@@ -147,6 +147,9 @@ fun Map(
         }
     }
 
+    ListenForFriendRequestsScreen(db, userName)
+    ListenForHelpRequestsScreen(db, userName)
+
     // Box layout para segurar o mapa e os botões
     Box(modifier = Modifier.fillMaxSize()) {
         // MapView
@@ -183,9 +186,9 @@ fun Map(
 
         Column(
             modifier = Modifier
-                .padding(16.dp) // Adjust padding as needed
+                .padding(16.dp)
                 .fillMaxWidth(),
-            horizontalAlignment = Alignment.End // Align content to the start (left)
+            horizontalAlignment = Alignment.End
 
         ) {
             Box(modifier = Modifier.clickable { navController.navigate("storage_screen/$id?username=$userName") }) {

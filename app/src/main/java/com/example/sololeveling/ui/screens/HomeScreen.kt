@@ -74,42 +74,6 @@ fun HomeScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-
-        Image(
-            painter = painterResource(id = R.drawable.huntersguildgate),
-            contentDescription = "Background Image",
-            modifier = Modifier
-                .fillMaxSize(), // Make the image fill the entire screen
-            contentScale = ContentScale.Crop // Ensure the image covers the entire area
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(16.dp) // Adjust padding as needed
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.End // Align content to the start (left)
-
-        ) {
-            Box(modifier = Modifier.clickable { navController.navigate("storage_screen/$id?username=$username") }) {
-                Image(
-                    painter = painterResource(id = R.drawable.usericon),
-                    contentDescription = "Icon Image",
-                    modifier = Modifier
-                        .size(160.dp) // Adjust size as needed
-                )
-            }
-        }
-
-        Image(
-            painter = painterResource(id = R.drawable.userfullbody),
-            contentDescription = "Home Image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center)
-                .fillMaxSize()
-                .height(250.dp), // Adjust height as needed
-        )
-
         // Login Dialog
         println("DIALOG")
         println(username)
@@ -194,41 +158,6 @@ fun HomeScreen(
                             Text("Create Account")
                         }
                     }
-                }
-            }
-        } else {
-            ListenForFriendRequestsScreen(db, username)
-            ListenForHelpRequestsScreen(db, username)
-        }
-
-        // Buttons at the bottom of the screen, overlaid on top of the image
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .background(Color.Black.copy(alpha = 0.5f)) // Semi-transparent background
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                println("USERNAME: $username")
-                Button(onClick = { navController.navigate("map_screen/?$id&username=$username") }) {
-                    Text("Map")
-                }
-
-                Button(onClick = { navController.navigate("dailies_screen/?$id&username=$username") }) {
-                    Text("Dailies")
-                }
-
-                Button(onClick = { navController.navigate("guild_screen/?$id&username=$username") }) {
-                    Text("Guild")
-                }
-
-                Button(onClick = { navController.navigate("portal_screen/?$id&username=$username") }) {
-                    Text("Portal")
                 }
             }
         }
