@@ -136,8 +136,9 @@ fun Portal(
 
                         else -> Text("Erro: + $magneticField")
                     }
+                    
                     Spacer(Modifier.size(32.dp))
-                    Button(onClick = { navController.navigate("dailies_screen/$id&username=$name2") }) {
+                    Button(onClick = { navController.navigate("dailies_screen/?$id&username=$name2") }) {
                         Text("Enter Portal")
                     }
                 }

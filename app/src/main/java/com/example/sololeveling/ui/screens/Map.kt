@@ -175,7 +175,7 @@ fun Map(
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Portal $uid" // Mostra o UID no título
                         setOnMarkerClickListener { _, _ ->
-                            navController.navigate("portal_screen/?$uid&username=$userName")
+                            navController.navigate("portal_screen/?$uid&username=$user")
                             true
                         }
                     }
@@ -191,7 +191,7 @@ fun Map(
             horizontalAlignment = Alignment.End
 
         ) {
-            Box(modifier = Modifier.clickable { navController.navigate("storage_screen/$id?username=$userName") }) {
+            Box(modifier = Modifier.clickable { navController.navigate("storage_screen/?$id&username=$userName") }) {
                 Image(
                     painter = painterResource(id = R.drawable.usericon),
                     contentDescription = "Icon Image",

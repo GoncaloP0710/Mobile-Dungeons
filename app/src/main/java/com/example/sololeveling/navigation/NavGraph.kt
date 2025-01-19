@@ -70,12 +70,13 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
             val name: String? = navBackStack.arguments?.getString("username")
+
             if (name != null) {
                 println("name is not null")
                 Dailies(navController = navController, id = id, context = context, db, name)
             } else {
                 println("id: $id")
-                println("name is null")
+                println("name is null: $name")
             }
         }
 
