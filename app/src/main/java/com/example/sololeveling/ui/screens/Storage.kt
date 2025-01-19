@@ -104,9 +104,6 @@ fun Storage(
                 .fillMaxSize(), // Make the image fill the entire screen
             contentScale = ContentScale.Crop // Ensure the image covers the entire area
         )
-        Button(onClick = { navController.navigate("home_screen/?$id&username=$userName2") }) {
-            Text("Home")
-        }
 
         Column(
             modifier = Modifier
@@ -308,9 +305,14 @@ fun Storage(
                 Button(onClick = {edit = true}) {
                     Text("Edit Profile")
                 }
+                Spacer(modifier = Modifier.height(150.dp))
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName2") }) {
+                    Text("Back")
+                }
             }
         }
     }
+
 
 
     // Home Screen

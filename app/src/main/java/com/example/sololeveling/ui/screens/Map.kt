@@ -214,10 +214,6 @@ fun Map(
                     Text("Friends")
                 }
 
-                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") }) {
-                    Text("Map")
-                }
-
                 // Botão para salvar posição do portal no Firebase
                 Button(
                     onClick = {
@@ -242,6 +238,11 @@ fun Map(
                     }
                 ) {
                     Text("Scan Portal")
+                }
+
+
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") }) {
+                    Text("Map")
                 }
             }
         }
