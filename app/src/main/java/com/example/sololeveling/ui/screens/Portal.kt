@@ -42,8 +42,10 @@ import com.google.firebase.database.ktx.getValue
 fun Portal(
     navController: NavController,
     id: Int,
-    context: Context // Pass context to access SensorManager
+    context: Context, // Pass context to access SensorManager
+    name: String
 ){
+    var name2 by remember { mutableStateOf(name) }
     var magneticField by remember { mutableDoubleStateOf(0.0) }
     var wait by remember { mutableStateOf(true) }
     var scanning_string by remember { mutableStateOf("Scanning") }
@@ -65,7 +67,7 @@ fun Portal(
     Scaffold (
         topBar = {
             // You can add a top bar if necessary
-            Button(onClick = { navController.navigate("home_screen/$id") }) {
+            Button(onClick = { navController.navigate("home_screen/?$id&username=$name2") }) {
                 Text("Home")
             }
         },

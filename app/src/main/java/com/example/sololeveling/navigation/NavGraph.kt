@@ -22,19 +22,30 @@ import com.google.firebase.database.FirebaseDatabase
 fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route+"?id=6",
+        startDestination = Screens.HomeScreen.route+"?id=6"+ "&username=",
     ) {
         // Home Screen
         composable(
-            route = Screens.HomeScreen.route + "?id={id}"
+            route = Screens.HomeScreen.route + "?id={id}" + "&username={username}"
         ) { navBackStack ->
             var id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull()?:1
+            val name: String? = navBackStack.arguments?.getString("username")
             var Notlogged: Boolean = false
             if(id == 6){
                 Notlogged = true
                 id = 5
             }
-            HomeScreen(navController = navController, id = id, db, Notlogged)
+            println("USER4: $name")
+            println("ID4: $id")
+            if(name == "placeholder"){
+                HomeScreen(navController = navController, id = id, db, Notlogged, "")
+            }
+            if(name != null){
+                HomeScreen(navController = navController, id = id, db, Notlogged, name)
+            }else{
+                HomeScreen(navController = navController, id = id, db, Notlogged, "")
+            }
+
         }
 
         // Storage
@@ -45,12 +56,13 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
             val name: String? = navBackStack.arguments?.getString("username")
             if (name != null) {
                 println("name is not null")
-                Storage(navController = navController, id = id, db, name)
+                Storage(navController = navController, id = id, db, name, context)
             } else {
                 println("id: $id")
                 println("name is null")
             }
         }
+
 
         // Dailies
         composable(
@@ -99,10 +111,16 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
 
         //Portal
         composable(
-            route = Screens.Portal.route + "?id={id}"
+            route = Screens.Portal.route + "?id={id}&username={username}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Portal(navController = navController, id = id, context = context)
+            val name: String? = navBackStack.arguments?.getString("username")
+            if(name != null){
+                Portal(navController = navController, id = id, context = context, name = name)
+            }
+            else{
+                Portal(navController = navController, id = id, context = context, name = "")
+            }
         }
     }
 }

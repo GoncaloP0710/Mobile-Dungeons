@@ -55,10 +55,17 @@ fun HomeScreen(
     navController: NavController,
     id: Int,
     db: FirebaseDatabase,
-    notlogged: Boolean = true
+    notlogged: Boolean = true,
+    user: String = ""
 ) {
+    println("USeR: " + user)
+    var user2 = user
+    if(user == "placeholder"){
+        user2 = ""
+    }
+    println("2: "+user2)
     var showDialog by rememberSaveable { mutableStateOf(notlogged) }
-    var username by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf(user2) }
     var password by remember { mutableStateOf("") }
     var isLoginSuccessful by remember { mutableStateOf(false) }
     var loginErrorMessage by remember { mutableStateOf("") }
@@ -104,6 +111,8 @@ fun HomeScreen(
         )
 
         // Login Dialog
+        println("DIALOG")
+        println(username)
         if (showDialog) {
             Dialog(onDismissRequest = { /* Do nothing to keep it open until valid login */ }) {
                 Column(
@@ -155,6 +164,10 @@ fun HomeScreen(
                     ) {
                         // Login Button
                         Button(onClick = {
+                            println("LOGIN")
+                            println(username)
+                            println(password)
+
                             loginUser(db, username, password, {
                                 showDialog = false
                                 isLoginSuccessful = true
@@ -199,19 +212,20 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { navController.navigate("map_screen/$id?username=$username") }) {
+                println("USERNAME: $username")
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$username") }) {
                     Text("Map")
                 }
 
-                Button(onClick = { navController.navigate("dailies_screen/$id?username=$username") }) {
+                Button(onClick = { navController.navigate("dailies_screen/?$id&username=$username") }) {
                     Text("Dailies")
                 }
 
-                Button(onClick = { navController.navigate("guild_screen/$id?username=$username") }) {
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$username") }) {
                     Text("Guild")
                 }
 
-                Button(onClick = { navController.navigate("portal_screen/$id") }) {
+                Button(onClick = { navController.navigate("portal_screen/?$id&username=$username") }) {
                     Text("Portal")
                 }
             }

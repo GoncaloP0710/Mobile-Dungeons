@@ -87,7 +87,7 @@ fun Guild(
             .padding(16.dp)
     ) {
         // Home Screen Button
-        Button(onClick = { navController.navigate("home_screen/$id") }) {
+        Button(onClick = { navController.navigate("home_screen/?$id&username=$userName") }) {
             Text("Home")
         }
 
