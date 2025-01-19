@@ -104,9 +104,6 @@ fun Storage(
                 .fillMaxSize(), // Make the image fill the entire screen
             contentScale = ContentScale.Crop // Ensure the image covers the entire area
         )
-        Button(onClick = { navController.navigate("home_screen/?$id&username=$userName2") }) {
-            Text("Home")
-        }
 
         Column(
             modifier = Modifier
@@ -197,64 +194,45 @@ fun Storage(
                 }else if(!wait){
                     measureMagneticField(context) { magneticField = it }
                     when(magneticField){
-                        in 0.0 .. 33.0 -> Text(text="E rank",
-                            style = TextStyle(
-                                fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFF808080), Color(0xFFB0C4DE)) // Gradient colors
-                                ))
-                        )
+                        in 0.0 .. 33.0 -> {
+                            powerLevel = "E"
+                        }
 
-                        in 33.0 .. 66.0 -> Text(text="D rank",
-                            style = TextStyle(
-                                fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFF1E90FF), Color(0xFF808080)) // Gradient colors
-                                ))
-                        )
+                        in 33.0 .. 66.0 -> {
+                            powerLevel = "D"
+                        }
 
-                        in 66.0 .. 100.0 -> Text(text="C rank",
-                            style = TextStyle(
-                                fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFF32CD32), Color(0xFF1E90FF)) // Gradient colors
-                                ))
-                        )
+                        in 66.0 .. 100.0 -> {
+                            powerLevel = "C"
+                        }
 
-                        in 100.0 .. 133.0 -> Text(text="B rank",
-                            style = TextStyle(
-                                fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFFFD700), Color(0xFF32CD32)) // Gradient colors
-                                ))
-                        )
+                        in 100.0 .. 133.0 -> {
+                            powerLevel = "B"
+                        }
 
-                        in 133.0 .. 166.0 -> Text(text="A rank",
-                            style = TextStyle(
-                                fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFFFA500), Color(0xFFFFD700)) // Gradient colors
-                                ))
-                        )
+                        in 133.0 .. 166.0 ->{
+                            powerLevel = "A"
+                        }
 
-                        in 166.0 .. 200.0 -> Text(text="S rank",
-                            style = TextStyle(
-                                fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0xFFFFD700), Color(0xFFFF4500)) // Gradient colors
-                                ))
-                        )
+                        in 166.0 .. 200.0 -> {
+                            powerLevel = "S"
+                        }
+                        else -> {
+                            Text("Erro: + $magneticField")
+                            powerLevel = ""
+                        }
 
-
-                        else -> Text("Erro: + $magneticField")
                     }
-
+                    val updateInfo = mapOf(
+                        "Age" to age,
+                        "Name" to userName2,
+                        "Description" to description,
+                        "DungeonsSpotted" to dungeonsSpotted2.toInt(),
+                        "PowerLevel" to powerLevel
+                    )
+                    usersRef.child(userName).updateChildren(updateInfo)
+                        .addOnSuccessListener { /* Handle success if needed */ }
+                        .addOnFailureListener { /* Handle error if needed */ }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
@@ -308,9 +286,14 @@ fun Storage(
                 Button(onClick = {edit = true}) {
                     Text("Edit Profile")
                 }
+                Spacer(modifier = Modifier.height(150.dp))
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName2") }) {
+                    Text("Back")
+                }
             }
         }
     }
+
 
 
     // Home Screen
@@ -319,6 +302,8 @@ fun Storage(
     //}
 
 }
+
+
 @Composable
 fun PowerLevel(power : String){
     Text(
