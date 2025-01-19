@@ -286,6 +286,9 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
     var helpRequester by remember { mutableStateOf("") }
     var helpRequestTime by remember { mutableStateOf("") }
 
+    // Set to track processed help requests
+    val processedRequests = remember { mutableStateOf(mutableSetOf<String>()) }
+
     // Reference to the UserHelp node for the current user
     val userHelpRef = db.reference.child("UserHelp").child(userName)
 
@@ -295,25 +298,32 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 // New help request detected
                 val requestTime = snapshot.getValue(String::class.java)
-                if (requestTime != null) {
-                    // Parse the request time from Firebase
-                    val requestDateTime = LocalDateTime.parse(requestTime, DateTimeFormatter.ISO_DATE_TIME)
-                    val now = LocalDateTime.now()
+                val requestKey = snapshot.key
 
-                    // Check if the request is within the last 5 minutes
-                    if (Duration.between(requestDateTime, now).toMinutes() <= 5) {
-                        helpRequester = snapshot.key ?: "Unknown"
-                        helpRequestTime = requestTime
-                        showDialog.value = true
-                    } else {
-                        // Outdated request: Remove from Firebase
-                        snapshot.ref.removeValue()
-                            .addOnSuccessListener {
-                                Log.d("FirebaseCleanup", "Discarded outdated help request from $helpRequester")
-                            }
-                            .addOnFailureListener {
-                                Log.e("FirebaseCleanupError", it.message ?: "Error discarding outdated request")
-                            }
+                if (requestTime != null && requestKey != null) {
+                    if (requestKey !in processedRequests.value) {
+                        // Parse the request time from Firebase
+                        val requestDateTime = LocalDateTime.parse(requestTime, DateTimeFormatter.ISO_DATE_TIME)
+                        val now = LocalDateTime.now()
+
+                        // Check if the request is within the last 5 minutes
+                        if (Duration.between(requestDateTime, now).toMinutes() <= 5) {
+                            helpRequester = requestKey
+                            helpRequestTime = requestTime
+                            showDialog.value = true
+
+                            // Mark the request as processed
+                            processedRequests.value.add(requestKey)
+                        } else {
+                            // Outdated request: Remove from Firebase
+                            snapshot.ref.removeValue()
+                                .addOnSuccessListener {
+                                    Log.d("FirebaseCleanup", "Discarded outdated help request from $helpRequester")
+                                }
+                                .addOnFailureListener {
+                                    Log.e("FirebaseCleanupError", it.message ?: "Error discarding outdated request")
+                                }
+                        }
                     }
                 }
             }
@@ -344,6 +354,7 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
         )
     }
 }
+
 
 
 @Composable
