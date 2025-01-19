@@ -9,18 +9,29 @@ import android.location.LocationManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.example.sololeveling.R
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import org.osmdroid.config.Configuration
@@ -49,7 +60,7 @@ fun Map(
 
     // Estado para armazenar localização atual e marcadores
     var currentLocation by remember { mutableStateOf<GeoPoint?>(null) }
-    var portalMarkers by remember { mutableStateOf<List<GeoPoint>>(emptyList()) }
+    var portalMarkers by remember { mutableStateOf<List<Pair<String, GeoPoint>>>(emptyList()) }
     var hasLocationPermission by remember { mutableStateOf(false) }
 
     // Inicializar o LocationManager
@@ -123,10 +134,11 @@ fun Map(
         // Recuperar marcadores de portais existentes do Firebase
         portalPositionRef.get().addOnSuccessListener { snapshot ->
             val portals = snapshot.children.mapNotNull { child ->
+                val uid = child.key // Obtém o UID
                 val latitude = child.child("latitude").getValue(Double::class.java)
                 val longitude = child.child("longitude").getValue(Double::class.java)
-                if (latitude != null && longitude != null) {
-                    GeoPoint(latitude, longitude)
+                if (uid != null && latitude != null && longitude != null) {
+                    uid to GeoPoint(latitude, longitude) // Cria um par (UID, GeoPoint)
                 } else null
             }
             portalMarkers = portals
@@ -141,8 +153,9 @@ fun Map(
         AndroidView(
             factory = {
                 MapView(context).apply {
-                    setMultiTouchControls(true)
-                    controller.setZoom(15.0)
+                    setMultiTouchControls(true) // Permite gestos multitouch
+                    setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
+                    controller.setZoom(10.0)
                 }
             },
             modifier = Modifier.fillMaxSize(),
@@ -153,49 +166,84 @@ fun Map(
 
                 // Adicionar marcadores de portais
                 mapView.overlays.clear()
-                portalMarkers.forEach { portal ->
+                portalMarkers.forEach { (uid, position) ->
                     val marker = Marker(mapView).apply {
-                        position = portal
+                        this.position = position
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Portal"
+                        title = "Portal $uid" // Mostra o UID no título
+                        setOnMarkerClickListener { _, _ ->
+                            navController.navigate("portal_screen/?$uid&username=$userName")
+                            true
+                        }
                     }
                     mapView.overlays.add(marker)
                 }
             }
         )
 
-        // Botão para salvar posição do portal no Firebase
-        Button(
-            onClick = {
-                currentLocation?.let { location ->
-                    val portalMap = mapOf(
-                        "latitude" to location.latitude,
-                        "longitude" to location.longitude
-                    )
-                    portalPositionRef.push().setValue(portalMap)
-                        .addOnSuccessListener {
-                            Toast.makeText(context, "Portal salvo no Firebase", Toast.LENGTH_SHORT).show()
-                            portalMarkers = portalMarkers + location
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
-                        }
-                } ?: Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
-            },
+        Column(
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                .padding(16.dp) // Adjust padding as needed
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.End // Align content to the start (left)
+
         ) {
-            Text("Salvar Portal")
+            Box(modifier = Modifier.clickable { navController.navigate("storage_screen/$id?username=$userName") }) {
+                Image(
+                    painter = painterResource(id = R.drawable.usericon),
+                    contentDescription = "Icon Image",
+                    modifier = Modifier
+                        .size(160.dp) // Adjust size as needed
+                )
+            }
         }
 
-        // Botão para voltar à tela inicial
-        println("USER3: $userName")
-        Button(
-            onClick = { navController.navigate("home_screen/?$id&username=$userName") },
-            modifier = Modifier.padding(16.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .background(Color.Black.copy(alpha = 0.5f)) // Semi-transparent background
+                .padding(16.dp)
         ) {
-            Text("Home")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$userName") }) {
+                    Text("Friends")
+                }
+
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") }) {
+                    Text("Map")
+                }
+
+                // Botão para salvar posição do portal no Firebase
+                Button(
+                    onClick = {
+                        currentLocation?.let { location ->
+                            val newPortalRef = portalPositionRef.push() // Gera uma nova referência com UID único
+                            val portalUID = newPortalRef.key // Obtém o UID único gerado
+                            val portalMap = mapOf(
+                                "uid" to portalUID, // Adiciona o UID ao mapa
+                                "latitude" to location.latitude,
+                                "longitude" to location.longitude
+                            )
+                            newPortalRef.setValue(portalMap)
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, "Portal salvo no Firebase", Toast.LENGTH_SHORT).show()
+                                    // Atualiza portalMarkers com o novo par (UID, GeoPoint)
+                                    portalMarkers = portalMarkers + (portalUID!! to GeoPoint(location.latitude, location.longitude))
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
+                                }
+                        } ?: Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Text("Scan Portal")
+                }
+            }
         }
     }
 }

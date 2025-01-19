@@ -116,10 +116,10 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
             val name: String? = navBackStack.arguments?.getString("username")
             if(name != null){
-                Portal(navController = navController, id = id, context = context, name = name)
+                Portal(navController = navController, id = id, context = context, name = name, db)
             }
             else{
-                Portal(navController = navController, id = id, context = context, name = "")
+                Portal(navController = navController, id = id, context = context, name = "", db)
             }
         }
     }
