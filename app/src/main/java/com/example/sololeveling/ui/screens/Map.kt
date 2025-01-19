@@ -9,23 +9,29 @@ import android.location.LocationManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.example.sololeveling.R
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import org.osmdroid.config.Configuration
@@ -147,8 +153,8 @@ fun Map(
         AndroidView(
             factory = {
                 MapView(context).apply {
-                    setMultiTouchControls(true)
-                    controller.setZoom(15.0)
+                    setMultiTouchControls(true) // Permite gestos multitouch
+                    controller.setZoom(10.0)
                 }
             },
             modifier = Modifier.fillMaxSize(),
@@ -173,6 +179,23 @@ fun Map(
                 }
             }
         )
+
+        Column(
+            modifier = Modifier
+                .padding(16.dp) // Adjust padding as needed
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.End // Align content to the start (left)
+
+        ) {
+            Box(modifier = Modifier.clickable { navController.navigate("storage_screen/$id?username=$userName") }) {
+                Image(
+                    painter = painterResource(id = R.drawable.usericon),
+                    contentDescription = "Icon Image",
+                    modifier = Modifier
+                        .size(160.dp) // Adjust size as needed
+                )
+            }
+        }
 
         Box(
             modifier = Modifier
