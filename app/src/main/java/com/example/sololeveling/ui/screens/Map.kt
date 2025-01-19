@@ -49,7 +49,7 @@ fun Map(
 
     // Estado para armazenar localização atual e marcadores
     var currentLocation by remember { mutableStateOf<GeoPoint?>(null) }
-    var portalMarkers by remember { mutableStateOf<List<GeoPoint>>(emptyList()) }
+    var portalMarkers by remember { mutableStateOf<List<Pair<String, GeoPoint>>>(emptyList()) }
     var hasLocationPermission by remember { mutableStateOf(false) }
 
     // Inicializar o LocationManager
@@ -123,10 +123,11 @@ fun Map(
         // Recuperar marcadores de portais existentes do Firebase
         portalPositionRef.get().addOnSuccessListener { snapshot ->
             val portals = snapshot.children.mapNotNull { child ->
+                val uid = child.key // Obtém o UID
                 val latitude = child.child("latitude").getValue(Double::class.java)
                 val longitude = child.child("longitude").getValue(Double::class.java)
-                if (latitude != null && longitude != null) {
-                    GeoPoint(latitude, longitude)
+                if (uid != null && latitude != null && longitude != null) {
+                    uid to GeoPoint(latitude, longitude) // Cria um par (UID, GeoPoint)
                 } else null
             }
             portalMarkers = portals
@@ -153,11 +154,15 @@ fun Map(
 
                 // Adicionar marcadores de portais
                 mapView.overlays.clear()
-                portalMarkers.forEach { portal ->
+                portalMarkers.forEach { (uid, position) ->
                     val marker = Marker(mapView).apply {
-                        position = portal
+                        this.position = position
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Portal"
+                        title = "Portal $uid" // Mostra o UID no título
+                        setOnMarkerClickListener { _, _ ->
+                            navController.navigate("Portal/$uid")
+                            true
+                        }
                     }
                     mapView.overlays.add(marker)
                 }
@@ -168,14 +173,18 @@ fun Map(
         Button(
             onClick = {
                 currentLocation?.let { location ->
+                    val newPortalRef = portalPositionRef.push() // Gera uma nova referência com UID único
+                    val portalUID = newPortalRef.key // Obtém o UID único gerado
                     val portalMap = mapOf(
+                        "uid" to portalUID, // Adiciona o UID ao mapa
                         "latitude" to location.latitude,
                         "longitude" to location.longitude
                     )
-                    portalPositionRef.push().setValue(portalMap)
+                    newPortalRef.setValue(portalMap)
                         .addOnSuccessListener {
                             Toast.makeText(context, "Portal salvo no Firebase", Toast.LENGTH_SHORT).show()
-                            portalMarkers = portalMarkers + location
+                            // Atualiza portalMarkers com o novo par (UID, GeoPoint)
+                            portalMarkers = portalMarkers + (portalUID!! to GeoPoint(location.latitude, location.longitude))
                         }
                         .addOnFailureListener {
                             Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
