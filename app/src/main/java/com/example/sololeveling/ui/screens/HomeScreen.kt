@@ -69,22 +69,23 @@ fun HomeScreen(
     var loginErrorMessage by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Image Background: Ensure the image fills the screen
+        // Background Image
         Image(
-            painter = painterResource(id = R.drawable.gradient), // Substitua com seu caminho correto da imagem gradient.jpg
+            painter = painterResource(id = R.drawable.gradient),
             contentDescription = "Background Image",
-            modifier = Modifier.fillMaxSize().alpha(0.8f) // Diminui a opacidade para não sobrecarregar o texto
+            modifier = Modifier.fillMaxSize().alpha(0.8f),
+            contentScale = ContentScale.Crop
         )
 
         // Login Dialog
         if (showDialog) {
-            Dialog(onDismissRequest = {  }) {
+            Dialog(onDismissRequest = { } ) {
                 Column(
                     modifier = Modifier
-                        .padding(48.dp)  // Aumenta o padding da Box
+                        .padding(48.dp)
                         .fillMaxWidth()
-                        .background(Color(0xAA000000), RoundedCornerShape(16.dp)) // Fundo semi-transparente
-                        .padding(32.dp) // Aumenta o padding interno
+                        .background(Color(0xAA000000), RoundedCornerShape(16.dp))
+                        .padding(32.dp)
                 ) {
                     // Título
                     Text(
@@ -94,7 +95,7 @@ fun HomeScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
 
-                    Spacer(modifier = Modifier.height(32.dp)) // Aumenta o espaçamento entre o título e os campos
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // Username input
                     OutlinedTextField(
@@ -137,7 +138,7 @@ fun HomeScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp)) // Aumenta o espaçamento entre os campos e os botões
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // Buttons Row
                     Row(
@@ -157,16 +158,15 @@ fun HomeScreen(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(56.dp), // Aumenta a altura do botão
+                                .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF6200EE), // Cor de fundo do botão
+                                containerColor = Color.Blue,
                                 contentColor = Color.White // Cor do texto no botão
                             )
                         ) {
                             Text("Login")
                         }
 
-                        // Register Button
                         Button(
                             onClick = {
                                 val newUser = mapOf("Name" to username, "Pass" to password)
@@ -178,10 +178,10 @@ fun HomeScreen(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(56.dp), // Aumenta a altura do botão
+                                .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF03DAC5), // Cor de fundo do botão
-                                contentColor = Color.White // Cor do texto no botão
+                                containerColor = Color.Blue,
+                                contentColor = Color.White
                             )
                         ) {
                             Text("Create Account")
@@ -192,7 +192,6 @@ fun HomeScreen(
         }
     }
 }
-
 
 
 
