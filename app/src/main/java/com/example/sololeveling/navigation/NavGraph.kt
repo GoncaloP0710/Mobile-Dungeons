@@ -19,11 +19,11 @@ import com.google.firebase.database.FirebaseDatabase
 fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDatabase) {
     NavHost(
         navController = navController,
-        startDestination = Screens.HomeScreen.route+"?id=6"+ "?username=",
+        startDestination = Screens.HomeScreen.route+"?id=6"+ "&username=",
     ) {
         // Home Screen
         composable(
-            route = Screens.HomeScreen.route + "?id={id}" + "?username={username}"
+            route = Screens.HomeScreen.route + "?id={id}" + "&username={username}"
         ) { navBackStack ->
             var id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull()?:1
             val name: String? = navBackStack.arguments?.getString("username")
@@ -32,6 +32,8 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
                 Notlogged = true
                 id = 5
             }
+            println("USER4: $name")
+            println("ID4: $id")
             if(name == "placeholder"){
                 HomeScreen(navController = navController, id = id, db, Notlogged, "")
             }
@@ -75,10 +77,17 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
 
         // Dailies
         composable(
-            route = Screens.Dailies.route + "?id={id}"
+            route = Screens.Dailies.route + "?id={id}&username={username}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Dailies(navController = navController, id = id, context = context)
+            val name: String? = navBackStack.arguments?.getString("username")
+            if(name != null){
+                Dailies(navController = navController, id = id, context = context, name= name)
+            }else{
+                Dailies(navController = navController, id = id, context = context, name= "")
+            }
+
+
         }
 
         // Guild
@@ -113,10 +122,16 @@ fun NavGraph(navController: NavHostController, context: Context, db: FirebaseDat
 
         //Portal
         composable(
-            route = Screens.Portal.route + "?id={id}"
+            route = Screens.Portal.route + "?id={id}&username={username}"
         ) { navBackStack ->
             val id: Int = navBackStack.arguments?.getString("id")?.toIntOrNull() ?: 1
-            Portal(navController = navController, id = id, context = context)
+            val name: String? = navBackStack.arguments?.getString("username")
+            if(name != null){
+                Portal(navController = navController, id = id, context = context, name = name)
+            }
+            else{
+                Portal(navController = navController, id = id, context = context, name = "")
+            }
         }
     }
 }

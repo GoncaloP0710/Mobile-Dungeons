@@ -195,19 +195,20 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { navController.navigate("map_screen/$id?username=$username") }) {
+                println("USERNAME: $username")
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$username") }) {
                     Text("Map")
                 }
 
-                Button(onClick = { navController.navigate("dailies_screen/$id") }) {
+                Button(onClick = { navController.navigate("dailies_screen/?$id&username=$username") }) {
                     Text("Dailies")
                 }
 
-                Button(onClick = { navController.navigate("guild_screen/$id?username=$username") }) {
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$username") }) {
                     Text("Guild")
                 }
 
-                Button(onClick = { navController.navigate("portal_screen/$id") }) {
+                Button(onClick = { navController.navigate("portal_screen/?$id&username=$username") }) {
                     Text("Portal")
                 }
             }

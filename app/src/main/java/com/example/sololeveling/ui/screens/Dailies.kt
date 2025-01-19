@@ -74,7 +74,8 @@ data class MonsterDetails(
 fun Dailies(
     navController: NavController,
     id: Int,
-    context: Context // Pass context to access SensorManager
+    context: Context, // Pass context to access SensorManager
+    name: String
 ) {
     var magneticField by remember { mutableDoubleStateOf(0.0) }
     var ambientTemperature by remember { mutableFloatStateOf(0.0F) }
@@ -96,7 +97,7 @@ fun Dailies(
     Scaffold(
         topBar = {
             // You can add a top bar if necessary
-            Button(onClick = { navController.navigate("home_screen/$id") }) {
+            Button(onClick = { navController.navigate("home_screen/?$id&username=$name") }) {
                 Text("Home")
             }
         },

@@ -48,6 +48,7 @@ fun Storage(
     context: Context // Pass context to access SensorManager
 ) {
 
+    var userName2 =userName
     // Use state to hold values
     var age by remember { mutableStateOf(0) }
     var description by remember { mutableStateOf("") }
@@ -91,7 +92,7 @@ fun Storage(
                 .fillMaxSize(), // Make the image fill the entire screen
             contentScale = ContentScale.Crop // Ensure the image covers the entire area
         )
-        Button(onClick = { navController.navigate("home_screen/$id?username=$userName\"") }) {
+        Button(onClick = { navController.navigate("home_screen/?$id&username=$userName2") }) {
             Text("Home")
         }
 

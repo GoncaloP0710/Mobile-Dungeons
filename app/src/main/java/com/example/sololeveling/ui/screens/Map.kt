@@ -190,8 +190,9 @@ fun Map(
         }
 
         // Botão para voltar à tela inicial
+        println("USER3: $userName")
         Button(
-            onClick = { navController.navigate("home_screen/$id?username=$userName\"") },
+            onClick = { navController.navigate("home_screen/?$id&username=$userName") },
             modifier = Modifier.padding(16.dp)
         ) {
             Text("Home")
