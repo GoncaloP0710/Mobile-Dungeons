@@ -186,7 +186,7 @@ fun Storage(
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                 )
-            
+
             if(!edit){
                 Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
                 PowerLevel(powerLevel)
