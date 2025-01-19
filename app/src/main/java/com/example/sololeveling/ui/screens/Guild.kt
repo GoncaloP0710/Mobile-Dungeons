@@ -134,18 +134,6 @@ fun Guild(
                 .padding(16.dp) // Adjust padding as needed
                 .fillMaxWidth(),
         ) {
-            // Header Section
-            Text(
-                text = "Friends Manager",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 50.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-                modifier = Modifier
-                    .padding(bottom = 24.dp) // Add more space below the title for better layout
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // State to track the active button
             var activeButton by remember { mutableStateOf("") }
@@ -217,9 +205,7 @@ fun Guild(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 8.dp
-                    )
+                    colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
                 ) {
                     LazyColumn(
                         modifier = Modifier.padding(8.dp)
@@ -264,7 +250,7 @@ fun Guild(
                                     Text(
                                         text = friend,
                                         fontSize = 18.sp,
-                                        color = Color.Black,
+                                        color = Color.White,
                                         modifier = Modifier.padding(4.dp)
                                     )
                                 }
@@ -273,7 +259,7 @@ fun Guild(
                                 Text(
                                     text = "Power Level: $powerLevel", // Show power level on the right
                                     fontSize = 18.sp,
-                                    color = Color.Black,
+                                    color = Color.White,
                                     modifier = Modifier.padding(4.dp)
                                 )
                             }
@@ -288,10 +274,7 @@ fun Guild(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 8.dp
-                    )
-
+                    colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
                 ) {
                     LazyColumn(
                         modifier = Modifier.padding(8.dp)
@@ -313,7 +296,7 @@ fun Guild(
                                 Text(
                                     text = request,
                                     fontSize = 18.sp,
-                                    color = Color.Black,
+                                    color = Color.White,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))

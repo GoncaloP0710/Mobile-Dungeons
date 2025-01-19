@@ -11,11 +11,17 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,9 +46,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sololeveling.R
 import com.google.firebase.database.DatabaseReference
@@ -93,6 +104,8 @@ fun Dailies(
     db: FirebaseDatabase,
     userName: String
 ) {
+    val name = userName
+
     var magneticField by remember { mutableDoubleStateOf(0.0) }
     var ambientTemperature by remember { mutableFloatStateOf(0.0F) }
     var pressure by remember { mutableDoubleStateOf(0.0) }
@@ -116,95 +129,187 @@ fun Dailies(
         }
     }
 
-    Scaffold(
-        topBar = {
-            // You can add a top bar if necessary
-            Button(onClick = { navController.navigate("home_screen/?$id&username=$userName") }) {
-                Text("Home")
-            }
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Display Magnetic Field
-                measureMagneticField(context) { magneticField = it }
-                Text(text = "Magnetic Field: $magneticField µT")
+    // Image as background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Scaffold(
+            content = {
+                Image(
+                    painter = painterResource(id = R.drawable.gradient),
+                    contentDescription = "Background Image",
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        // Title Section
+                        Text(
+                            text = "Environment Metrics",
+                            style = MaterialTheme.typography.headlineMedium.copy(color = Color.White),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
 
-
-                // Display Ambient Temperature
-                measureAmbientTemperature(context) { ambientTemperature = it }
-                Text(text = "Ambient Temperature: $ambientTemperature °C")
-
-
-                // Display Pressure
-                measurePressure(context) { pressure = it }
-                Text(text = "Pressure: $pressure hPa")
-                Button(onClick = { measurePressure(context) { pressure = it } }) {
-                    Text("Measure Pressure")
-                }
-
-                    // Humidity
-                    Text(text = "Humidity: $humidity %")
-                    Button(onClick = { measureHumidity(context) { humidity = it } }) {
-                        Text("Measure Humidity")
-                    }
-
-                    // Light Level
-                    Text(text = "Light Level: $lightLevel lx")
-                    Button(onClick = { measureLight(context) { lightLevel = it } }) {
-                        Text("Measure Light")
-                    }
-
-                    // Check for nearby users and send help request
-                    Button(onClick = {
-                        checkAndRequestHelpFromFirebase(userPositionRef, userHelpRef, userName)
-                    }) {
-                        Text("Check Nearby Users & Send Help Request")
-                    }
-
-                    if (isLoading) {
-                        CircularProgressIndicator()
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
+                        // Environmental Data Section
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(monsterDetailsList) { monster ->
-                                MonsterCard(monster)
+                            measureMagneticField(context) { magneticField = it }
+                            Text(
+                                text = "Magnetic Field: $magneticField µT",
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+                            )
+                            measureAmbientTemperature(context) { ambientTemperature = it }
+                            Text(
+                                text = "Ambient Temperature: $ambientTemperature °C",
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+                            )
+                            measurePressure(context) { pressure = it }
+                            Text(
+                                text = "Pressure: $pressure hPa",
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+                            )
+                            measureHumidity(context) { humidity = it }
+                            Text(
+                                text = "Humidity: $humidity %",
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+                            )
+                            measureLight(context) { lightLevel = it }
+                            Text(
+                                text = "Light Level: $lightLevel lx",
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+                            )
+                        }
+
+                        // Send Help Request Button Section
+                        Button(
+                            onClick = {
+                                checkAndRequestHelpFromFirebase(userPositionRef, userHelpRef, userName)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63)) // Vibrant color for the button
+                        ) {
+                            Text("Send Help Request", color = Color.White)
+                        }
+
+                        // Loading Indicator (if applicable)
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+
+                        // Monster List Section
+                        Text(
+                            text = "Most likely Monsters to appear",
+                            style = MaterialTheme.typography.headlineMedium.copy(color = Color.White),
+                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.80f)
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(monsterDetailsList) { monster ->
+                                    MonsterCard(monster)
+                                }
                             }
                         }
                     }
                 }
             }
         )
+
+        // Bottom Navigation Buttons
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black.copy(alpha = 0.7f)) // Semi-transparent background for the navigation bar
+                .padding(16.dp)
+                .align(Alignment.BottomCenter)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$name") }) {
+                    Text("Map", fontSize = 16.sp)
+                }
+
+                Button(onClick = { navController.navigate("portal_screen/?$id&username=$name") }) {
+                    Text("Scan Portal", fontSize = 16.sp)
+                }
+
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$name") }) {
+                    Text("Friends", fontSize = 16.sp)
+                }
+            }
+        }
     }
 
+}
 
 @Composable
 fun MonsterCard(monster: MonsterDetails) {
     Card(
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .heightIn(min = 120.dp) // Ensure a minimum height for each card
+            .heightIn(min = 140.dp), // Ensure a minimum height for each card
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)) // Semi-transparent card background
     ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth() // Ensure the content inside takes full width
+                .fillMaxWidth()
         ) {
-            Text("Name: ${monster.name}", style = MaterialTheme.typography.titleMedium)
-            Text("Size: ${monster.size}")
-            Text("Type: ${monster.type}")
-            Text("Hit Points: ${monster.hitPoints}")
-            Text("Challenge Rating: ${monster.challengeRating}")
+            Text(
+                text = monster.name,
+                style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Size: ${monster.size}",
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+            )
+            Text(
+                text = "Type: ${monster.type}",
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+            )
+            Text(
+                text = "Hit Points: ${monster.hitPoints}",
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+            )
+            Text(
+                text = "Challenge Rating: ${monster.challengeRating}",
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+            )
         }
     }
 }
