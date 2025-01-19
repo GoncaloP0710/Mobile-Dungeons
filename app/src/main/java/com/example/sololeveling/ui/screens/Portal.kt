@@ -43,7 +43,8 @@ fun Portal(
     navController: NavController,
     id: Int,
     context: Context, // Pass context to access SensorManager
-    name: String
+    name: String,
+    db: FirebaseDatabase
 ){
     var name2 by remember { mutableStateOf(name) }
     var magneticField by remember { mutableDoubleStateOf(0.0) }
@@ -157,15 +158,15 @@ fun Portal(
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = { navController.navigate("map_screen/$id") }) {
+                    Button(onClick = { navController.navigate("map_screen/?$id&username=$name") }) {
                         Text("Map")
                     }
 
-                    Button(onClick = { navController.navigate("dailies_screen/$id") }) {
+                    Button(onClick = { navController.navigate("dailies_screen/?$id&username=$name") }) {
                         Text("Dailies")
                     }
 
-                    Button(onClick = { navController.navigate("guild_screen/$id") }) {
+                    Button(onClick = { navController.navigate("guild_screen/?$id&username=$name") }) {
                         Text("Guild")
                     }
                 }

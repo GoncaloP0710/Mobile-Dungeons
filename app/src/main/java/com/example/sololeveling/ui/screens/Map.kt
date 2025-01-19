@@ -160,7 +160,7 @@ fun Map(
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Portal $uid" // Mostra o UID no título
                         setOnMarkerClickListener { _, _ ->
-                            navController.navigate("Portal/$uid")
+                            navController.navigate("portal_screen/?$uid&username=$userName")
                             true
                         }
                     }
