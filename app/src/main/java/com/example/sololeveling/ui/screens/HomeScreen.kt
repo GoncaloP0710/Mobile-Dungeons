@@ -459,34 +459,6 @@ fun HelpNotificationDialog(
 }
 
 @Composable
-fun InviteDungeonDialog(
-    showDialog: MutableState<Boolean>,
-    name: String,
-    onAccept: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = { showDialog.value = false },
-        title = { Text("New Friend Invite") },
-        text = { Text("You have a new invite for a dungeon from $name!") },
-        confirmButton = {
-            TextButton(onClick = {
-                onAccept()
-                Log.d("DungeonInvite", "Accepted dungeon invite from $name")
-            }) {
-                Text(text = "Accept")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = {
-                showDialog.value = false
-            }) {
-                Text(text = "Dismiss")
-            }
-        }
-    )
-}
-
-@Composable
 fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView: MapView) {
     val showDialog = remember { mutableStateOf(false) }
     var inviteRequester by remember { mutableStateOf("") }
@@ -499,7 +471,6 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
     DisposableEffect(userInviteRef) {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                // Check if the node has children (users who sent invites)
                 if (snapshot.hasChildren()) {
                     val firstInviteKey = snapshot.children.firstOrNull()?.key
                     val firstInviteValue = snapshot.children.firstOrNull()?.getValue(String::class.java)
@@ -508,14 +479,17 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
                         inviteRequester = firstInviteValue
 
                         // Fetch position from UserPosition for the inviteRequester
-                        db.reference.child("UserPosition").child(firstInviteKey)
+                        db.reference.child("UserPosition").child(userName)
                             .get()
                             .addOnSuccessListener { positionSnapshot ->
                                 requesterLatitude = positionSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
                                 requesterLongitude = positionSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
 
-                                // Show dialog
+                                // Show dialog after coordinates are updated
                                 showDialog.value = true
+                            }
+                            .addOnFailureListener {
+                                Log.e("InviteDebug", "Failed to fetch position: ${it.message}")
                             }
                     }
                 }
@@ -557,5 +531,35 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
         )
     }
 }
+
+@Composable
+fun InviteDungeonDialog(
+    showDialog: MutableState<Boolean>,
+    name: String,
+    onAccept: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text("New Friend Invite") },
+        text = { Text("You have a new invite for a dungeon from $name!") },
+        confirmButton = {
+            TextButton(onClick = {
+                onAccept()
+                Log.d("DungeonInvite", "Accepted dungeon invite from $name")
+            }) {
+                Text(text = "Accept")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                showDialog.value = false
+            }) {
+                Text(text = "Dismiss")
+            }
+        }
+    )
+}
+
+
 
 
