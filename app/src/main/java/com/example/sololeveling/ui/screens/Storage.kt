@@ -39,6 +39,10 @@ import com.google.firebase.database.ktx.getValue
 import android.content.Context
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -191,65 +195,49 @@ fun Storage(
             }
             Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
             if(!edit){
-                Column(modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ){
-                        Text(
-                            text = "Age: ",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f),
-                        )
-                        Text(
-                            text = "$age",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
-                    Row (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ){
-                        Text(
-                            text = "Dungeons Spotted: ",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = "$dungeonsSpotted2",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp), // Add padding for a clean look
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Title
+                    Text(
+                        text = "User Details",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    )
 
-                    }
-                    Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
-                    Row (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ){
-                        Text(
-                            text = "Description: ",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = "$description",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
+                    // User Information Card
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Dark background for the card
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp) // Space between rows
+                        ) {
+                            // Age Row
+                            InfoRow(label = "Age:", value = "$age")
 
+                            // Dungeons Spotted Row
+                            InfoRow(label = "Dungeons Spotted:", value = "$dungeonsSpotted2")
+
+                            // Description Row
+                            InfoRow(label = "Description:", value = "$description")
+                        }
                     }
                 }
-
             }
 
             if(edit){
@@ -283,14 +271,12 @@ fun Storage(
                 )
             }
 
-
-
             Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
 
             Spacer(modifier = Modifier.height(32.dp)) // Adjusted spacing
 
-
             Spacer(modifier = Modifier.height(16.dp)) // Adjusted spacing
+
             if(edit){
                 Button(onClick = {
                     edit = false
@@ -308,11 +294,13 @@ fun Storage(
                     Text("Save")
                 }
             }else{
-                Row(modifier = Modifier
-                    .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
-                ){
-                    Button(onClick = {edit = true}) {
+
+                    Button(onClick = {edit = true},
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))
+
+                    ) {
+
                         Text("Edit Profile")
                     }
                     //Spacer(modifier = Modifier.height(16.dp))
@@ -338,13 +326,18 @@ fun Storage(
                         timer.start()
 
 
-                    }){
+                    },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))
+                    ){
                         Text("Measure Power")
                     }
-                }
+
 
                 Spacer(modifier = Modifier.height(150.dp))
-                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName2") }) {
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName2") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))
+                ) {
                     Text("Back")
                 }
             }
@@ -428,4 +421,31 @@ fun PowerLevel(power : String){
         else -> Text("-")
     }
 
+}
+
+// Reusable composable for rows
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween, // Spread items apart
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Gray,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = value,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
+    }
 }
