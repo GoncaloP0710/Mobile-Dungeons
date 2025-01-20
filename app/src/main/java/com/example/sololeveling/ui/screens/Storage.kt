@@ -195,12 +195,13 @@ fun Storage(
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Row (
                         modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
                     ){
                         Text(
                             text = "Age: ",
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         )
                         Text(
                             text = "$age",
@@ -211,7 +212,8 @@ fun Storage(
                     }
                     Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
                     Row (
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
                     ){
                         Text(
                             text = "Dungeons Spotted: ",
@@ -230,6 +232,7 @@ fun Storage(
                     Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
                     Row (
                         modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
                     ){
                         Text(
                             text = "Description: ",
