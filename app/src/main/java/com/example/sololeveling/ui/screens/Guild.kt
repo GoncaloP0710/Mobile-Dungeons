@@ -154,7 +154,7 @@ fun Guild(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "friendsList") Color.Blue else Color.Gray // Change color based on active button
+                        if (activeButton == "friendsList") Color.Black else Color.Gray // Change color based on active button
                     )
                 ) {
                     Text("Friends List", fontSize = 16.sp, color = Color.White)
@@ -172,7 +172,7 @@ fun Guild(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "friendRequests") Color.Blue else Color.Gray // Change color based on active button
+                        if (activeButton == "friendRequests") Color.Black else Color.Gray // Change color based on active button
                     )
                 ) {
                     Text("Friend Requests", fontSize = 16.sp, color = Color.White)
@@ -190,7 +190,7 @@ fun Guild(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "sendRequests") Color.Blue else Color.Gray // Change color based on active button
+                        if (activeButton == "sendRequests") Color.Black else Color.Gray // Change color based on active button
                     )
                 ) {
                     Text("Send Requests", fontSize = 16.sp, color = Color.White)
