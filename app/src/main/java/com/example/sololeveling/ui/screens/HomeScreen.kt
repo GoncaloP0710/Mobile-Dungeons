@@ -515,20 +515,18 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
             onAccept = {
                 // Move the map to the requester's coordinates
                 moveMapToCoordinates(mapView, requesterLatitude, requesterLongitude)
-
-                // Remove the processed invite from the database
-                userInviteRef.child(inviteRequester).removeValue()
-                    .addOnSuccessListener {
-                        Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
-                    }
-                    .addOnFailureListener {
-                        Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
-                    }
-
                 // Close the dialog
                 showDialog.value = false
             }
         )
+        // Remove the processed invite from the database
+        userInviteRef.child(inviteRequester).removeValue()
+            .addOnSuccessListener {
+                Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
+            }
+            .addOnFailureListener {
+                Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
+            }
     }
 }
 

@@ -174,7 +174,7 @@ fun Guild(
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
-                    Text("Requests", fontSize = 16.sp, color = Color.White)
+                    Text("Requests", fontSize = 14.sp, color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))

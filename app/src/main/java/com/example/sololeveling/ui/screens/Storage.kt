@@ -241,7 +241,11 @@ fun Storage(
                 }
             }
 
-            if(edit){
+            if (edit) {
+                val originalAge = remember { age } // Guardar o valor original de age
+                val originalDescription = remember { description } // Guardar o valor original da descrição
+
+                // Input fields
                 OutlinedTextField(
                     value = age2,
                     onValueChange = { age2 = it },
@@ -253,12 +257,11 @@ fun Storage(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.White,
                         unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White // Optionally, change the cursor color
+                        cursorColor = Color.White
                     ),
                 )
-                age = age2.toInt()
 
-                Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
                     value = description,
@@ -271,34 +274,53 @@ fun Storage(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.White,
                         unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White // Optionally, change the cursor color
+                        cursorColor = Color.White
                     ),
                 )
-            }
 
-            Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(32.dp)) // Adjusted spacing
+                // Buttons in a Row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            // Cancel: Restore original values
+                            edit = false
+                            age2 = originalAge.toString()
+                            description = originalDescription
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))
+                    ) {
+                        Text("Cancel")
+                    }
 
-            Spacer(modifier = Modifier.height(16.dp)) // Adjusted spacing
-
-            if(edit){
-                Button(onClick = {
-                    edit = false
-                    val updateInfo = mapOf(
-                        "Age" to age,
-                        "Name" to userName2,
-                        "Description" to description,
-                        "DungeonsSpotted" to dungeonsSpotted2.toInt(),
-                        "PowerLevel" to powerLevel
-                    )
-                    usersRef.child(userName).updateChildren(updateInfo)
-                        .addOnSuccessListener { /* Handle success if needed */ }
-                        .addOnFailureListener { /* Handle error if needed */ }
-                }, colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))) {
-                    Text("Save")
+                    Button(
+                        onClick = {
+                            // Save: Apply changes
+                            edit = false
+                            age = age2.toInt()
+                            val updateInfo = mapOf(
+                                "Age" to age,
+                                "Name" to userName2,
+                                "Description" to description,
+                                "DungeonsSpotted" to dungeonsSpotted2.toInt(),
+                                "PowerLevel" to powerLevel
+                            )
+                            usersRef.child(userName).updateChildren(updateInfo)
+                                .addOnSuccessListener { /* Handle success if needed */ }
+                                .addOnFailureListener { /* Handle error if needed */ }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))
+                    ) {
+                        Text("Save")
+                    }
                 }
-            }else{
+            } else {
 
                     Button(onClick = {edit = true},
                         modifier = Modifier.fillMaxWidth(),

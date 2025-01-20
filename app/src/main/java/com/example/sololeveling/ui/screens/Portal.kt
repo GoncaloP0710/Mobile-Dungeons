@@ -274,6 +274,40 @@ fun Portal(
                     ) {
                         Text("Enter Portal", fontSize = 18.sp, color = Color.White)
                     }
+
+                    Spacer(Modifier.size(16.dp))
+
+                    Button(
+                        onClick = {
+                            val navBackStackEntry = navController.currentBackStackEntry
+                            val arguments = navBackStackEntry?.arguments
+                            val uid = arguments?.getString("uid")
+
+                            if (uid != null) {
+                                val portalRef = db.reference.child("Portals").child(uid)
+
+                                portalRef.removeValue()
+                                    .addOnSuccessListener {
+                                        Log.d("ClosePortal", "Portal $uid successfully removed.")
+                                        // Navegar de volta para a tela do mapa
+                                        navController.navigate("map_screen/?$id&username=$name")
+                                    }
+                                    .addOnFailureListener { error ->
+                                        Log.e("ClosePortal", "Failed to close portal: ${error.message}")
+                                    }
+                            } else {
+                                Log.e("ClosePortal", "UID is null!")
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(alpha = 0.8f))
+                    ) {
+                        Text("Close Portal", fontSize = 18.sp, color = Color.White)
+                    }
+
+
                 }
             }
         },

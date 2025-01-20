@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -177,7 +178,7 @@ fun Map(
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Portal $uid" // Mostra o UID no título
                         setOnMarkerClickListener { _, _ ->
-                            navController.navigate("portal_screen/?$uid&username=$user")
+                            navController.navigate("portal_screen/?uid=$uid&username=$user")
                             true
                         }
                     }
@@ -244,13 +245,21 @@ fun Map(
                                     portalMarkers = portalMarkers + (portalUID!! to GeoPoint(location.latitude, location.longitude))
 
                                     // Referência do usuário atual
-                                    val userRef = FirebaseDatabase.getInstance().getReference("Users").child(userName)
-
-                                    // Atualiza o valor de DungeonsSpotted incrementando em 1
+                                    val userRef = db.reference.child("Users").child(userName)
                                     userRef.child("DungeonsSpotted").get()
                                         .addOnSuccessListener { snapshot ->
                                             val currentDungeonsSpotted = snapshot.getValue<Int>() ?: 0
+                                            Log.d("ScanPortal", "DungeonsSpotted atual: $currentDungeonsSpotted")
                                             userRef.child("DungeonsSpotted").setValue(currentDungeonsSpotted + 1)
+                                                .addOnSuccessListener {
+                                                    Log.d("ScanPortal", "DungeonsSpotted atualizado para: ${currentDungeonsSpotted + 1}")
+                                                }
+                                                .addOnFailureListener { error ->
+                                                    Log.e("ScanPortal", "Erro ao atualizar DungeonsSpotted: ${error.message}")
+                                                }
+                                        }
+                                        .addOnFailureListener { error ->
+                                            Log.e("ScanPortal", "Erro ao buscar DungeonsSpotted: ${error.message}")
                                         }
                                 }
                                 .addOnFailureListener {
