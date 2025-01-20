@@ -24,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -353,8 +354,13 @@ fun Guild(
                     OutlinedTextField(
                         value = friendRequestName,
                         onValueChange = { friendRequestName = it },
-                        label = { Text("Enter username") },
-                        modifier = Modifier.weight(1f)
+                        label = { Text("Enter username", color = Color.White)},
+                        modifier = Modifier.weight(1f),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            cursorColor = Color.White
+                        ),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     var showDialog by remember { mutableStateOf(false) }
