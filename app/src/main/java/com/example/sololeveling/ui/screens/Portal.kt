@@ -66,13 +66,18 @@ fun Portal(
     }
     timer.start()
     Scaffold (
+
         topBar = {
-            // You can add a top bar if necessary
-            Button(onClick = { navController.navigate("home_screen/?$id&username=$name2") }) {
-                Text("Home")
-            }
+
         },
         content = {
+            Image(
+                painter = painterResource(id = R.drawable.gradient2),
+                contentDescription = "Background Image",
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -81,7 +86,9 @@ fun Portal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 if(wait){
-                    Text(scanning_string)
+                    Text(text = scanning_string,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold)
                 }else{
                     measureMagneticField(context) { magneticField = it }
                     when(magneticField){
@@ -163,12 +170,12 @@ fun Portal(
                         Text("Map")
                     }
 
-                    Button(onClick = { navController.navigate("dailies_screen/?$id&username=$name") }) {
-                        Text("Dailies")
-                    }
+//                    Button(onClick = { navController.navigate("dailies_screen/?$id&username=$name") }) {
+//                        Text("Dailies")
+//                    }
 
                     Button(onClick = { navController.navigate("guild_screen/?$id&username=$name") }) {
-                        Text("Guild")
+                        Text("Friends")
                     }
                 }
             }

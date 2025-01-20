@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -213,7 +214,10 @@ fun Map(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") }) {
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$userName") },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black
+                    )) {
                     Text("Map")
                 }
 

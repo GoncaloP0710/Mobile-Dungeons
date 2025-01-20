@@ -261,9 +261,9 @@ fun Dailies(
                     Text("Map", fontSize = 16.sp)
                 }
 
-                Button(onClick = { navController.navigate("portal_screen/?$id&username=$name") }) {
-                    Text("Scan Portal", fontSize = 16.sp)
-                }
+//                Button(onClick = { navController.navigate("portal_screen/?$id&username=$name") }) {
+//                    Text("Scan Portal", fontSize = 16.sp)
+//                }
 
                 Button(onClick = { navController.navigate("guild_screen/?$id&username=$name") }) {
                     Text("Friends", fontSize = 16.sp)

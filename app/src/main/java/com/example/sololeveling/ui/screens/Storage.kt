@@ -98,11 +98,11 @@ fun Storage(
 
 
         Image(
-            painter = painterResource(id = R.drawable.huntersguildgate),
+            painter = painterResource(id = R.drawable.gradient),
             contentDescription = "Background Image",
             modifier = Modifier
-                .fillMaxSize(), // Make the image fill the entire screen
-            contentScale = ContentScale.Crop // Ensure the image covers the entire area
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
 
         Column(
