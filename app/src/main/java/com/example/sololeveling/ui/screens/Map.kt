@@ -163,13 +163,7 @@ fun Map(
     Box(modifier = Modifier.fillMaxSize()) {
         // MapView
         AndroidView(
-            factory = {
-                MapView(context).apply {
-                    setMultiTouchControls(true) // Permite gestos multitouch
-                    setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
-                    controller.setZoom(10.0)
-                }
-            },
+            factory = { mapView }, // Passa a instância mapView para o AndroidView
             modifier = Modifier.fillMaxSize(),
             update = { mapView ->
                 currentLocation?.let { location ->
@@ -198,7 +192,6 @@ fun Map(
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.End
-
         ) {
             Box(modifier = Modifier
                 .padding(top = 16.dp)
@@ -278,6 +271,7 @@ fun Map(
         }
     }
 }
+
 
 // Função para salvar a localização atual no Firebase
 private fun saveCurrentLocation(
