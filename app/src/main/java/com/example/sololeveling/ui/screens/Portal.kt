@@ -178,67 +178,87 @@ fun Portal(
                             .padding(bottom = 16.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
                     ) {
-
-                        LazyColumn(
-                            modifier = Modifier.padding(8.dp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.600f)
                         ) {
-                            items(friendsList) { friend ->
-                                // Use a state to store the power level for each friend
-                                var powerLevel by remember { mutableStateOf<String>("") }
 
-                                // Fetch data from Firebase
-                                val usersRef = db.getReference("UsersInfo")
-                                LaunchedEffect(friend) { // Launching the effect when a new friend is encountered
-                                    usersRef.child(friend).get().addOnSuccessListener { snapshot ->
-                                        if (snapshot.exists()) {
-                                            powerLevel =
-                                                snapshot.child("PowerLevel").getValue<String>()
-                                                    .orEmpty()
-                                        } else {
-                                            powerLevel = "Rank not found"
+                            LazyColumn(
+                                modifier = Modifier.padding(8.dp)
+                            ) {
+                                items(friendsList) { friend ->
+                                    // Use a state to store the power level for each friend
+                                    var powerLevel by remember { mutableStateOf<String>("") }
+
+                                    // Fetch data from Firebase
+                                    val usersRef = db.getReference("UsersInfo")
+                                    LaunchedEffect(friend) { // Launching the effect when a new friend is encountered
+                                        usersRef.child(friend).get()
+                                            .addOnSuccessListener { snapshot ->
+                                                if (snapshot.exists()) {
+                                                    powerLevel =
+                                                        snapshot.child("PowerLevel")
+                                                            .getValue<String>()
+                                                            .orEmpty()
+                                                } else {
+                                                    powerLevel = "Rank not found"
+                                                }
+                                            }.addOnFailureListener {
+                                            println("Error: ${it.message}")
+                                            powerLevel = "Error fetching data"
                                         }
-                                    }.addOnFailureListener {
-                                        println("Error: ${it.message}")
-                                        powerLevel = "Error fetching data"
                                     }
-                                }
 
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween, // Distribute space between items
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
-                                ) {
-                                    // Left side: Friend's name and image
                                     Row(
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween, // Distribute space between items
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
                                     ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.profile), // Replace with your image resource
-                                            contentDescription = "User Icon",
-                                            modifier = Modifier
-                                                .size(40.dp)
-                                                .padding(end = 8.dp)
-                                        )
-                                        Text(
-                                            text = friend,
-                                            fontSize = 18.sp,
-                                            color = Color.White,
-                                            modifier = Modifier.padding(4.dp)
-                                        )
-                                    }
-
-                                    Button(onClick = {
-                                        val portalInvite = db.reference.child("UserPortalInvite").child(friend)
-                                        portalInvite.get().addOnSuccessListener { userSnapshot ->
-                                            val userInvited = userSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
-                                            portalInvite.setValue(userInvited + name)
+                                        // Left side: Friend's name and image
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.profile), // Replace with your image resource
+                                                contentDescription = "User Icon",
+                                                modifier = Modifier
+                                                    .size(40.dp)
+                                                    .padding(end = 8.dp)
+                                            )
+                                            Text(
+                                                text = friend,
+                                                fontSize = 18.sp,
+                                                color = Color.White,
+                                                modifier = Modifier.padding(4.dp)
+                                            )
                                         }
 
-                                    },
-                                        colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))) {
-                                        Text("Send invite", fontSize = 16.sp)
+                                        Button(
+                                            onClick = {
+                                                val portalInvite =
+                                                    db.reference.child("UserPortalInvite")
+                                                        .child(friend)
+                                                portalInvite.get()
+                                                    .addOnSuccessListener { userSnapshot ->
+                                                        val userInvited =
+                                                            userSnapshot.getValue(object :
+                                                                GenericTypeIndicator<List<String>>() {})
+                                                                ?: emptyList()
+                                                        portalInvite.setValue(userInvited + name)
+                                                    }
+
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Cyan.copy(
+                                                    alpha = 0.15f
+                                                )
+                                            )
+                                        ) {
+                                            Text("Send invite", fontSize = 16.sp)
+                                        }
                                     }
                                 }
                             }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -197,146 +198,194 @@ fun Guild(
 
             // Friends List Section
             if (showFriendsList) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.padding(8.dp)
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
                     ) {
-                        items(friendsList) { friend ->
-                            // Use a state to store the power level for each friend
-                            var powerLevel by remember { mutableStateOf<String>("") }
-
-                            // Fetch data from Firebase
-                            val usersRef = db.getReference("UsersInfo")
-                            LaunchedEffect(friend) { // Launching the effect when a new friend is encountered
-                                usersRef.child(friend).get().addOnSuccessListener { snapshot ->
-                                    if (snapshot.exists()) {
-                                        powerLevel = snapshot.child("PowerLevel").getValue<String>().orEmpty()
-                                    } else {
-                                        powerLevel = "Rank not found"
-                                    }
-                                }.addOnFailureListener {
-                                    println("Error: ${it.message}")
-                                    powerLevel = "Error fetching data"
-                                }
-                            }
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween, // Distribute space between items
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.900f)
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier.padding(8.dp)
                             ) {
-                                // Left side: Friend's name and image
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.profile), // Replace with your image resource
-                                        contentDescription = "User Icon",
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .padding(end = 8.dp)
-                                    )
-                                    Text(
-                                        text = friend,
-                                        fontSize = 18.sp,
-                                        color = Color.White,
-                                        modifier = Modifier.padding(4.dp)
-                                    )
-                                }
+                                items(friendsList) { friend ->
+                                    // Use a state to store the power level for each friend
+                                    var powerLevel by remember { mutableStateOf<String>("") }
 
-                                // Right side: Power level
-                                Text(
-                                    text = "Power Level: $powerLevel", // Show power level on the right
-                                    fontSize = 18.sp,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(4.dp)
-                                )
+                                    // Fetch data from Firebase
+                                    val usersRef = db.getReference("UsersInfo")
+                                    LaunchedEffect(friend) { // Launching the effect when a new friend is encountered
+                                        usersRef.child(friend).get().addOnSuccessListener { snapshot ->
+                                            if (snapshot.exists()) {
+                                                powerLevel =
+                                                    snapshot.child("PowerLevel").getValue<String>()
+                                                        .orEmpty()
+                                            } else {
+                                                powerLevel = "Rank not found"
+                                            }
+                                        }.addOnFailureListener {
+                                            println("Error: ${it.message}")
+                                            powerLevel = "Error fetching data"
+                                        }
+                                    }
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween, // Distribute space between items
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    ) {
+                                        // Left side: Friend's name and image
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.profile), // Replace with your image resource
+                                                contentDescription = "User Icon",
+                                                modifier = Modifier
+                                                    .size(40.dp)
+                                                    .padding(end = 8.dp)
+                                            )
+                                            Text(
+                                                text = friend,
+                                                fontSize = 18.sp,
+                                                color = Color.White,
+                                                modifier = Modifier.padding(4.dp)
+                                            )
+                                        }
+
+                                        // Right side: Power level
+                                        Text(
+                                            text = "Power Level: $powerLevel", // Show power level on the right
+                                            fontSize = 18.sp,
+                                            color = Color.White,
+                                            modifier = Modifier.padding(4.dp)
+                                        )
+                                    }
+                                }
                             }
-                        }
                     }
                 }
             }
 
             // Friend Requests Section
             if (showFriendRequests) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.padding(8.dp)
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
                     ) {
-                        items(friendRequests.map { it.removeSuffix("@n") }) { request ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.900f)
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier.padding(8.dp)
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.profile), // Replace with your image resource
-                                    contentDescription = "User Icon",
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .padding(end = 8.dp)
-                                )
-                                Text(
-                                    text = request,
-                                    fontSize = 18.sp,
-                                    color = Color.White,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(onClick = {
-                                    // Accept friend request
-                                    val requestRef = db.reference.child("FriendRequests").child(userName)
-                                    requestRef.get().addOnSuccessListener { snapshot ->
-                                        val requests = snapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+                                items(friendRequests.map { it.removeSuffix("@n") }) { request ->
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp)
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.profile), // Replace with your image resource
+                                            contentDescription = "User Icon",
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .padding(end = 8.dp)
+                                        )
+                                        Text(
+                                            text = request,
+                                            fontSize = 18.sp,
+                                            color = Color.White,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Button(
+                                            onClick = {
+                                                // Accept friend request
+                                                val requestRef =
+                                                    db.reference.child("FriendRequests").child(userName)
+                                                requestRef.get().addOnSuccessListener { snapshot ->
+                                                    val requests = snapshot.getValue(object :
+                                                        GenericTypeIndicator<List<String>>() {})
+                                                        ?: emptyList()
 
-                                        // Remove the original request with the '@n' part
-                                        val updatedRequests = requests.filterNot { it == "$request@n" }.filterNot { it == request } // Properly remove the entire request
+                                                    // Remove the original request with the '@n' part
+                                                    val updatedRequests =
+                                                        requests.filterNot { it == "$request@n" }
+                                                            .filterNot { it == request } // Properly remove the entire request
 
-                                        // Remove the request from Firebase once accepted
-                                        requestRef.setValue(updatedRequests)
+                                                    // Remove the request from Firebase once accepted
+                                                    requestRef.setValue(updatedRequests)
 
-                                        // Add the user to both users' friend lists
-                                        val userFriendsRef = db.reference.child("UserFriendsList").child(userName)
-                                        val friendFriendsRef = db.reference.child("UserFriendsList").child(request)
+                                                    // Add the user to both users' friend lists
+                                                    val userFriendsRef =
+                                                        db.reference.child("UserFriendsList")
+                                                            .child(userName)
+                                                    val friendFriendsRef =
+                                                        db.reference.child("UserFriendsList")
+                                                            .child(request)
 
-                                        userFriendsRef.get().addOnSuccessListener { userSnapshot ->
-                                            val userFriends = userSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
-                                            userFriendsRef.setValue(userFriends + request)
-                                        }
+                                                    userFriendsRef.get()
+                                                        .addOnSuccessListener { userSnapshot ->
+                                                            val userFriends =
+                                                                userSnapshot.getValue(object :
+                                                                    GenericTypeIndicator<List<String>>() {})
+                                                                    ?: emptyList()
+                                                            userFriendsRef.setValue(userFriends + request)
+                                                        }
 
-                                        friendFriendsRef.get().addOnSuccessListener { friendSnapshot ->
-                                            val friendFriends = friendSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
-                                            friendFriendsRef.setValue(friendFriends + userName)
-                                        }
+                                                    friendFriendsRef.get()
+                                                        .addOnSuccessListener { friendSnapshot ->
+                                                            val friendFriends =
+                                                                friendSnapshot.getValue(object :
+                                                                    GenericTypeIndicator<List<String>>() {})
+                                                                    ?: emptyList()
+                                                            friendFriendsRef.setValue(friendFriends + userName)
+                                                        }
 
-                                        // Optionally, delete the request from the request list of the friend
-                                        val friendRequestRef = db.reference.child("FriendRequests").child(request)
-                                        friendRequestRef.get().addOnSuccessListener { friendSnapshot ->
-                                            val friendRequests = friendSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
-                                            val updatedFriendRequests = friendRequests.filterNot { it == "$userName@n" }.filterNot { it == "$userName" } // Properly remove the entire request
-                                            friendRequestRef.setValue(updatedFriendRequests)
+                                                    // Optionally, delete the request from the request list of the friend
+                                                    val friendRequestRef =
+                                                        db.reference.child("FriendRequests")
+                                                            .child(request)
+                                                    friendRequestRef.get()
+                                                        .addOnSuccessListener { friendSnapshot ->
+                                                            val friendRequests =
+                                                                friendSnapshot.getValue(object :
+                                                                    GenericTypeIndicator<List<String>>() {})
+                                                                    ?: emptyList()
+                                                            val updatedFriendRequests =
+                                                                friendRequests.filterNot { it == "$userName@n" }
+                                                                    .filterNot { it == "$userName" } // Properly remove the entire request
+                                                            friendRequestRef.setValue(
+                                                                updatedFriendRequests
+                                                            )
+                                                        }
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Cyan.copy(alpha = 0.15f)
+                                            )
+                                        ) {
+                                            Text("Accept", fontSize = 16.sp)
                                         }
                                     }
-                                },colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))) {
-                                    Text("Accept", fontSize = 16.sp)
                                 }
                             }
                         }
                     }
-                }
             }
 
             // Sent Requests Section
