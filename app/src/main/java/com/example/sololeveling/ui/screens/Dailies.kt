@@ -137,7 +137,7 @@ fun Dailies(
         Scaffold(
             content = {
                 Image(
-                    painter = painterResource(id = R.drawable.gradient),
+                    painter = painterResource(id = R.drawable.background8),
                     contentDescription = "Background Image",
                     modifier = Modifier
                         .fillMaxSize(),
@@ -257,7 +257,8 @@ fun Dailies(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Button(onClick = { navController.navigate("map_screen/?$id&username=$name") }) {
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$name") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))) {
                     Text("Map", fontSize = 16.sp)
                 }
 
@@ -265,7 +266,8 @@ fun Dailies(
 //                    Text("Scan Portal", fontSize = 16.sp)
 //                }
 
-                Button(onClick = { navController.navigate("guild_screen/?$id&username=$name") }) {
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$name") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))) {
                     Text("Friends", fontSize = 16.sp)
                 }
             }

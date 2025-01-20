@@ -103,7 +103,7 @@ fun Storage(
 
 
         Image(
-            painter = painterResource(id = R.drawable.gradient),
+            painter = painterResource(id = R.drawable.background8),
             contentDescription = "Background Image",
             modifier = Modifier
                 .fillMaxSize(),
@@ -134,6 +134,7 @@ fun Storage(
                     text = "$userName2",
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
+                    color = Color.White
                 )
             if(!edit){
                 Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
@@ -141,7 +142,7 @@ fun Storage(
                 Spacer(modifier = Modifier.height(2.dp)) // Adjusted spacing
 
                 if(wait && scanning){
-                    Text(scanning_string)
+                    Text(scanning_string, color = Color.White)
                 }else if(!wait){
                     measureMagneticField(context) { magneticField = it }
                     when(magneticField){
@@ -244,13 +245,15 @@ fun Storage(
                 OutlinedTextField(
                     value = age2,
                     onValueChange = { age2 = it },
-                    label = { Text("Age", color = Color.Black) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.Black),
+                    label = { Text("Age", color = Color.White) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    textStyle = TextStyle(color = Color.White),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black,
-                        cursorColor = Color.Black // Optionally, change the cursor color
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White,
+                        cursorColor = Color.White // Optionally, change the cursor color
                     ),
                 )
                 age = age2.toInt()
@@ -260,13 +263,15 @@ fun Storage(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description", color = Color.Black) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.Black),
+                    label = { Text("Description", color = Color.White) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    textStyle = TextStyle(color = Color.White),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black,
-                        cursorColor = Color.Black // Optionally, change the cursor color
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color.White,
+                        cursorColor = Color.White // Optionally, change the cursor color
                     ),
                 )
             }
@@ -290,7 +295,7 @@ fun Storage(
                     usersRef.child(userName).updateChildren(updateInfo)
                         .addOnSuccessListener { /* Handle success if needed */ }
                         .addOnFailureListener { /* Handle error if needed */ }
-                }) {
+                }, colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))) {
                     Text("Save")
                 }
             }else{
@@ -334,7 +339,7 @@ fun Storage(
                     }
 
 
-                Spacer(modifier = Modifier.height(150.dp))
+                Spacer(modifier = Modifier.height(50.dp))
                 Button(onClick = { navController.navigate("map_screen/?$id&username=$userName2") },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))
                 ) {

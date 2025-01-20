@@ -72,7 +72,7 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         // Background Image
         Image(
-            painter = painterResource(id = R.drawable.gradient),
+            painter = painterResource(id = R.drawable.background8),
             contentDescription = "Background Image",
             modifier = Modifier.fillMaxSize().alpha(0.8f),
             contentScale = ContentScale.Crop
@@ -160,9 +160,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                contentColor = Color.White // Cor do texto no botão
-                            )
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                         ) {
                             Text("Login")
                         }
@@ -179,9 +177,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                contentColor = Color.White
-                            )
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                         ) {
                             Text("Create Account")
                         }

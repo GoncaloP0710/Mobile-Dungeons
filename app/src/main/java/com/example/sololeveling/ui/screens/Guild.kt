@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
@@ -123,7 +124,7 @@ fun Guild(
     ) {
 
         Image(
-            painter = painterResource(id = R.drawable.gradient),
+            painter = painterResource(id = R.drawable.background8),
             contentDescription = "Background Image",
             modifier = Modifier
                 .fillMaxSize(),
@@ -154,9 +155,7 @@ fun Guild(
                         activeButton = "friendsList" // Set the active button
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "friendsList") Color.Black else Color.Gray // Change color based on active button
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
                     Text("Friends List", fontSize = 16.sp, color = Color.White)
                 }
@@ -172,9 +171,7 @@ fun Guild(
                         activeButton = "friendRequests" // Set the active button
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "friendRequests") Color.Black else Color.Gray // Change color based on active button
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
                     Text("Friend Requests", fontSize = 16.sp, color = Color.White)
                 }
@@ -190,9 +187,7 @@ fun Guild(
                         activeButton = "sendRequests" // Set the active button
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "sendRequests") Color.Black else Color.Gray // Change color based on active button
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
                     Text("Send Requests", fontSize = 16.sp, color = Color.White)
                 }
@@ -242,7 +237,7 @@ fun Guild(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Image(
-                                        painter = painterResource(id = R.drawable.usericon), // Replace with your image resource
+                                        painter = painterResource(id = R.drawable.profile), // Replace with your image resource
                                         contentDescription = "User Icon",
                                         modifier = Modifier
                                             .size(40.dp)
@@ -288,7 +283,7 @@ fun Guild(
                                     .padding(8.dp)
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.usericon), // Replace with your image resource
+                                    painter = painterResource(id = R.drawable.profile), // Replace with your image resource
                                     contentDescription = "User Icon",
                                     modifier = Modifier
                                         .size(40.dp)
@@ -335,7 +330,7 @@ fun Guild(
                                             friendRequestRef.setValue(updatedFriendRequests)
                                         }
                                     }
-                                }) {
+                                },colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))) {
                                     Text("Accept", fontSize = 16.sp)
                                 }
                             }
@@ -355,6 +350,7 @@ fun Guild(
                         value = friendRequestName,
                         onValueChange = { friendRequestName = it },
                         label = { Text("Enter username", color = Color.White)},
+                        textStyle = TextStyle(color = Color.White),
                         modifier = Modifier.weight(1f),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White,
@@ -454,7 +450,8 @@ fun Guild(
                                 dialogMessage = "Invalid input. Please enter a valid username."
                                 showDialog = true
                             }
-                        }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                     ) {
                         Text("Send")
                     }
@@ -475,7 +472,8 @@ fun Guild(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Button(onClick = { navController.navigate("map_screen/?$id&username=$name") }) {
+                Button(onClick = { navController.navigate("map_screen/?$id&username=$name") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))) {
                     Text("Map", fontSize = 16.sp)
                 }
 

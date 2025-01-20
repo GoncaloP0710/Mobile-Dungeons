@@ -257,13 +257,14 @@ fun Map(
                                     Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
                                 }
                         } ?: Toast.makeText(context, "Localização não disponível", Toast.LENGTH_SHORT).show()
-                    }
+                    },colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
                     Text("Scan Portal")
                 }
 
 
-                Button(onClick = { navController.navigate("guild_screen/?$id&username=$userName") }) {
+                Button(onClick = { navController.navigate("guild_screen/?$id&username=$userName") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))) {
                     Text("Friends")
                 }
 
