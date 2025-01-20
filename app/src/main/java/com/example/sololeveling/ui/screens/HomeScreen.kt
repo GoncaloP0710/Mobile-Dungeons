@@ -44,9 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.delay
-import org.osmdroid.views.MapView
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -294,7 +292,7 @@ fun NotificationDialog(showDialog: MutableState<Boolean>, name: String) {
 }
 
 @Composable
-fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String, mapView: MapView) {
+fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
     val showDialog = remember { mutableStateOf(false) }
     var helpRequester by remember { mutableStateOf("") }
     var helpRequestTime by remember { mutableStateOf("") }
@@ -357,23 +355,7 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String, mapView:
         HelpNotificationDialog(
             showDialog = showDialog,
             name = helpRequester,
-            time = helpRequestTime,
-            onHelpButtonClick = {
-                userPosRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val latitude = snapshot.child("latitude").getValue(Double::class.java)
-                        val longitude = snapshot.child("longitude").getValue(Double::class.java)
-
-                        if (latitude != null && longitude != null) {
-                            moveMapToCoordinates(mapView, latitude, longitude)
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.e("FirebaseError", error.message)
-                    }
-                })
-            }
+            time = helpRequestTime
         )
 
         // Remove the processed request from Firebase after dialog confirmation
@@ -384,6 +366,7 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String, mapView:
             .addOnFailureListener {
                 Log.e("FirebaseCleanupError", it.message ?: "Error removing processed request")
             }
+
     }
 }
 
@@ -391,8 +374,7 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String, mapView:
 fun HelpNotificationDialog(
     showDialog: MutableState<Boolean>,
     name: String,
-    time: String,
-    onHelpButtonClick: () -> Unit
+    time: String
 ) {
     val context = LocalContext.current
     val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -446,7 +428,6 @@ fun HelpNotificationDialog(
             confirmButton = {
                 TextButton(onClick = {
                     Log.d("HelpRequest", "Accepted help request from $name")
-                    onHelpButtonClick() // Chama a função para mover o mapa
                     showDialog.value = false
                 }) {
                     Text(text = "Help")
@@ -462,3 +443,4 @@ fun HelpNotificationDialog(
         )
     }
 }
+
