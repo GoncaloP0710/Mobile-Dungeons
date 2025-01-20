@@ -158,7 +158,7 @@ fun Guild(
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
-                    Text("Friends List", fontSize = 16.sp, color = Color.White)
+                    Text("List", fontSize = 16.sp, color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -174,7 +174,7 @@ fun Guild(
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
-                    Text("Friend Requests", fontSize = 16.sp, color = Color.White)
+                    Text("Requests", fontSize = 16.sp, color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -190,7 +190,7 @@ fun Guild(
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                 ) {
-                    Text("Send Requests", fontSize = 16.sp, color = Color.White)
+                    Text("Add", fontSize = 16.sp, color = Color.White)
                 }
             }
 

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.delay
 import org.osmdroid.views.MapView
 import java.text.SimpleDateFormat
@@ -179,7 +180,7 @@ fun HomeScreen(
                                 .height(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                         ) {
-                            Text("Create Account")
+                            Text("Sign In")
                         }
                     }
                 }
@@ -457,4 +458,89 @@ fun HelpNotificationDialog(
     }
 }
 
+@Composable
+fun InviteDungeonDialog(showDialog: MutableState<Boolean>, name: String) {
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text("New Friend Invite") },
+        text = { Text("You have a new invite for a dungeon from $name!") },
+        confirmButton = {
+            TextButton(onClick = {
+                Log.d("HelpRequest", "Accepted help request from $name")
+            }) {
+                Text(text = "Accept")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                showDialog.value = false
+            }) {
+                Text(text = "Dismiss")
+            }
+        }
+    )
+}
+
+@Composable
+fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView: MapView) {
+    val showDialog = remember { mutableStateOf(false) }
+    var inviteRequester by remember { mutableStateOf("") }
+    var requesterLatitude by remember { mutableStateOf(0.0) }
+    var requesterLongitude by remember { mutableStateOf(0.0) }
+
+    // Reference to the UserPortalInvite node for the current user
+    val userInviteRef = db.reference.child("UserPortalInvite").child(userName)
+
+    DisposableEffect(userInviteRef) {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                // Check if the node has children (users who sent invites)
+                if (snapshot.hasChildren()) {
+                    // Fetch the first invite (example: for simplicity, processing only one invite at a time)
+                    val firstInviteKey = snapshot.children.firstOrNull()?.key
+                    val firstInviteValue = snapshot.children.firstOrNull()?.getValue(String::class.java)
+
+                    if (firstInviteKey != null && firstInviteValue != null) {
+                        inviteRequester = firstInviteValue
+
+                        // Fetch position from UserPosition for the inviteRequester
+                        db.reference.child("UserPosition").child(firstInviteKey)
+                            .get()
+                            .addOnSuccessListener { positionSnapshot ->
+                                requesterLatitude = positionSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
+                                requesterLongitude = positionSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
+
+                                // Show dialog
+                                showDialog.value = true
+                            }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseError", error.message)
+            }
+        }
+
+        userInviteRef.addValueEventListener(listener)
+
+        onDispose {
+            userInviteRef.removeEventListener(listener)
+        }
+    }
+
+    // Show the dialog when an invite is received
+    if (showDialog.value) {
+        InviteDungeonDialog(showDialog, inviteRequester)
+
+        // Remove the processed invite after showing the dialog
+        userInviteRef.child(inviteRequester).removeValue()
+            .addOnSuccessListener {
+                Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
+            }
+            .addOnFailureListener {
+                Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
+            }
+    }
+}
 

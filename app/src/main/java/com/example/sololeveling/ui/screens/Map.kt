@@ -274,6 +274,7 @@ fun Map(
 
     ListenForFriendRequestsScreen(db, userName)
     ListenForHelpRequestsScreen(db, userName, mapView)
+    ListenForDungeonInviteScreen(db, userName, mapView)
 }
 
 // Função para salvar a localização atual no Firebase
