@@ -163,7 +163,7 @@ fun HomeScreen(
                                 .height(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                         ) {
-                            Text("Login")
+                            Text("Sign In")
                         }
 
                         Button(
@@ -180,7 +180,7 @@ fun HomeScreen(
                                 .height(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan.copy(alpha = 0.15f))
                         ) {
-                            Text("Sign In")
+                            Text("Sign Up")
                         }
                     }
                 }
@@ -459,14 +459,19 @@ fun HelpNotificationDialog(
 }
 
 @Composable
-fun InviteDungeonDialog(showDialog: MutableState<Boolean>, name: String) {
+fun InviteDungeonDialog(
+    showDialog: MutableState<Boolean>,
+    name: String,
+    onAccept: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = { showDialog.value = false },
         title = { Text("New Friend Invite") },
         text = { Text("You have a new invite for a dungeon from $name!") },
         confirmButton = {
             TextButton(onClick = {
-                Log.d("HelpRequest", "Accepted help request from $name")
+                onAccept()
+                Log.d("DungeonInvite", "Accepted dungeon invite from $name")
             }) {
                 Text(text = "Accept")
             }
@@ -496,7 +501,6 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
             override fun onDataChange(snapshot: DataSnapshot) {
                 // Check if the node has children (users who sent invites)
                 if (snapshot.hasChildren()) {
-                    // Fetch the first invite (example: for simplicity, processing only one invite at a time)
                     val firstInviteKey = snapshot.children.firstOrNull()?.key
                     val firstInviteValue = snapshot.children.firstOrNull()?.getValue(String::class.java)
 
@@ -531,16 +535,27 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
 
     // Show the dialog when an invite is received
     if (showDialog.value) {
-        InviteDungeonDialog(showDialog, inviteRequester)
+        InviteDungeonDialog(
+            showDialog = showDialog,
+            name = inviteRequester,
+            onAccept = {
+                // Move the map to the requester's coordinates
+                moveMapToCoordinates(mapView, requesterLatitude, requesterLongitude)
 
-        // Remove the processed invite after showing the dialog
-        userInviteRef.child(inviteRequester).removeValue()
-            .addOnSuccessListener {
-                Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
+                // Remove the processed invite from the database
+                userInviteRef.child(inviteRequester).removeValue()
+                    .addOnSuccessListener {
+                        Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
+                    }
+                    .addOnFailureListener {
+                        Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
+                    }
+
+                // Close the dialog
+                showDialog.value = false
             }
-            .addOnFailureListener {
-                Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
-            }
+        )
     }
 }
+
 
