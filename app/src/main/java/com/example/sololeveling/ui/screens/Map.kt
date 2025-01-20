@@ -149,8 +149,15 @@ fun Map(
         }
     }
 
+    // Crie uma instância do MapView para passar para a função ListenForHelpRequestsScreen
+    val mapView = remember { MapView(context).apply {
+        setMultiTouchControls(true) // Permite gestos multitouch
+        setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
+        controller.setZoom(10.0)
+    }}
+
     ListenForFriendRequestsScreen(db, userName)
-    ListenForHelpRequestsScreen(db, userName)
+    ListenForHelpRequestsScreen(db, userName, mapView)
 
     // Box layout para segurar o mapa e os botões
     Box(modifier = Modifier.fillMaxSize()) {
@@ -315,5 +322,13 @@ private fun startLocationUpdates(
             LOCATION_REFRESH_DISTANCE,
             locationListener
         )
+    }
+}
+
+fun moveMapToCoordinates(mapView: MapView, latitude: Double, longitude: Double) {
+    val targetLocation = GeoPoint(latitude, longitude)
+    mapView.controller.apply {
+        setZoom(15.0) // Define o nível de zoom (ajuste conforme necessário)
+        setCenter(targetLocation) // Centraliza o mapa no local fornecido
     }
 }

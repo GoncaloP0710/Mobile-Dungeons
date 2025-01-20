@@ -45,6 +45,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import kotlinx.coroutines.delay
+import org.osmdroid.views.MapView
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
@@ -292,10 +293,12 @@ fun NotificationDialog(showDialog: MutableState<Boolean>, name: String) {
 }
 
 @Composable
-fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
+fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String, mapView: MapView) {
     val showDialog = remember { mutableStateOf(false) }
     var helpRequester by remember { mutableStateOf("") }
     var helpRequestTime by remember { mutableStateOf("") }
+    var helpRequesterLatitude by remember { mutableStateOf(0.0) }
+    var helpRequesterLongitude by remember { mutableStateOf(0.0) }
 
     // Set to track processed help requests
     val processedRequests = remember { mutableStateOf(mutableSetOf<String>()) }
@@ -307,27 +310,35 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
         val listener = object : ChildEventListener {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val requestTime = snapshot.getValue(String::class.java)
+                val requestData = snapshot.getValue(Map::class.java) as? Map<String, Any>
                 val requestKey = snapshot.key
 
-                if (requestTime != null && requestKey != null) {
-                    if (requestKey !in processedRequests.value) {
-                        val requestDateTime = LocalDateTime.parse(requestTime, DateTimeFormatter.ISO_DATE_TIME)
-                        val now = LocalDateTime.now()
+                if (requestData != null && requestKey != null) {
+                    val requestTime = requestData["time"] as? String
+                    val latitude = requestData["latitude"] as? Double
+                    val longitude = requestData["longitude"] as? Double
 
-                        if (Duration.between(requestDateTime, now).toMinutes() <= 5) {
-                            helpRequester = requestKey
-                            helpRequestTime = requestTime
-                            showDialog.value = true
-                            processedRequests.value.add(requestKey) // Mark request as processed
-                        } else {
-                            snapshot.ref.removeValue()
-                                .addOnSuccessListener {
-                                    Log.d("FirebaseCleanup", "Discarded outdated help request from $helpRequester")
-                                }
-                                .addOnFailureListener {
-                                    Log.e("FirebaseCleanupError", it.message ?: "Error discarding outdated request")
-                                }
+                    if (requestTime != null && latitude != null && longitude != null) {
+                        if (requestKey !in processedRequests.value) {
+                            val requestDateTime = LocalDateTime.parse(requestTime, DateTimeFormatter.ISO_DATE_TIME)
+                            val now = LocalDateTime.now()
+
+                            if (Duration.between(requestDateTime, now).toMinutes() <= 5) {
+                                helpRequester = requestKey
+                                helpRequestTime = requestTime
+                                helpRequesterLatitude = latitude
+                                helpRequesterLongitude = longitude
+                                showDialog.value = true
+                                processedRequests.value.add(requestKey) // Mark request as processed
+                            } else {
+                                snapshot.ref.removeValue()
+                                    .addOnSuccessListener {
+                                        Log.d("FirebaseCleanup", "Discarded outdated help request from $helpRequester")
+                                    }
+                                    .addOnFailureListener {
+                                        Log.e("FirebaseCleanupError", it.message ?: "Error discarding outdated request")
+                                    }
+                            }
                         }
                     }
                 }
@@ -353,7 +364,11 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
         HelpNotificationDialog(
             showDialog = showDialog,
             name = helpRequester,
-            time = helpRequestTime
+            time = helpRequestTime,
+            onHelpClicked = {
+                // Move map to the requester's location when "Help" is clicked
+                moveMapToCoordinates(mapView, helpRequesterLatitude, helpRequesterLongitude)
+            }
         )
 
         // Remove the processed request from Firebase after dialog confirmation
@@ -364,7 +379,6 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
             .addOnFailureListener {
                 Log.e("FirebaseCleanupError", it.message ?: "Error removing processed request")
             }
-
     }
 }
 
@@ -372,7 +386,8 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
 fun HelpNotificationDialog(
     showDialog: MutableState<Boolean>,
     name: String,
-    time: String
+    time: String,
+    onHelpClicked: () -> Unit // New callback for the "Help" button
 ) {
     val context = LocalContext.current
     val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -427,6 +442,7 @@ fun HelpNotificationDialog(
                 TextButton(onClick = {
                     Log.d("HelpRequest", "Accepted help request from $name")
                     showDialog.value = false
+                    onHelpClicked() // Call the move map function when the user clicks "Help"
                 }) {
                     Text(text = "Help")
                 }
@@ -441,4 +457,5 @@ fun HelpNotificationDialog(
         )
     }
 }
+
 
