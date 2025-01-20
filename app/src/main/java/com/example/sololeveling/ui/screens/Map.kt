@@ -193,12 +193,14 @@ fun Map(
             horizontalAlignment = Alignment.End
 
         ) {
-            Box(modifier = Modifier.clickable { navController.navigate("storage_screen/?$id&username=$userName") }) {
+            Box(modifier = Modifier
+                .padding(top = 16.dp)
+                .clickable { navController.navigate("storage_screen/?$id&username=$userName") }) {
                 Image(
-                    painter = painterResource(id = R.drawable.usericon),
+                    painter = painterResource(id = R.drawable.profile),
                     contentDescription = "Icon Image",
                     modifier = Modifier
-                        .size(160.dp) // Adjust size as needed
+                        .size(90.dp) // Adjust size as needed
                 )
             }
         }
