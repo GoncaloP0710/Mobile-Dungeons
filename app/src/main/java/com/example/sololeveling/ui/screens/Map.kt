@@ -149,20 +149,21 @@ fun Map(
         }
     }
 
+    // Crie uma instância do MapView para passar para a função ListenForHelpRequestsScreen
+    val mapView = remember { MapView(context).apply {
+        setMultiTouchControls(true) // Permite gestos multitouch
+        setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
+        controller.setZoom(10.0)
+    }}
+
     ListenForFriendRequestsScreen(db, userName)
-    ListenForHelpRequestsScreen(db, userName)
+    ListenForHelpRequestsScreen(db, userName, mapView)
 
     // Box layout para segurar o mapa e os botões
     Box(modifier = Modifier.fillMaxSize()) {
         // MapView
         AndroidView(
-            factory = {
-                MapView(context).apply {
-                    setMultiTouchControls(true) // Permite gestos multitouch
-                    setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
-                    controller.setZoom(10.0)
-                }
-            },
+            factory = { mapView }, // Passa a instância mapView para o AndroidView
             modifier = Modifier.fillMaxSize(),
             update = { mapView ->
                 currentLocation?.let { location ->
@@ -191,7 +192,6 @@ fun Map(
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.End
-
         ) {
             Box(modifier = Modifier
                 .padding(top = 16.dp)
@@ -272,6 +272,7 @@ fun Map(
     }
 }
 
+
 // Função para salvar a localização atual no Firebase
 private fun saveCurrentLocation(
     userPositionRef: DatabaseReference,
@@ -315,5 +316,13 @@ private fun startLocationUpdates(
             LOCATION_REFRESH_DISTANCE,
             locationListener
         )
+    }
+}
+
+fun moveMapToCoordinates(mapView: MapView, latitude: Double, longitude: Double) {
+    val targetLocation = GeoPoint(latitude, longitude)
+    mapView.controller.apply {
+        setZoom(15.0) // Define o nível de zoom (ajuste conforme necessário)
+        setCenter(targetLocation) // Centraliza o mapa no local fornecido
     }
 }
