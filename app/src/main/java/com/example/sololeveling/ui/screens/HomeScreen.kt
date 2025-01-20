@@ -200,6 +200,16 @@ fun loginUser(
     onSuccess: () -> Unit,
     onError: (String) -> Unit
 ) {
+    // Validação para impedir nome de usuário ou senha vazios
+    if (username.isBlank()) {
+        onError("Username cannot be empty.")
+        return
+    }
+    if (password.isBlank()) {
+        onError("Password cannot be empty.")
+        return
+    }
+
     val usersRef = db.getReference("Users")
     usersRef.child(username).get().addOnSuccessListener { snapshot ->
         if (snapshot.exists()) {
@@ -216,6 +226,7 @@ fun loginUser(
         onError("Login failed. Please try again.")
     }
 }
+
 
 @Composable
 fun ListenForFriendRequestsScreen(db: FirebaseDatabase, userName: String) {

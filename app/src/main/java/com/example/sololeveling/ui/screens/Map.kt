@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.example.sololeveling.R
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.getValue
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -221,7 +222,6 @@ fun Map(
                     Text("Map")
                 }
 
-                // Botão para salvar posição do portal no Firebase
                 Button(
                     onClick = {
                         currentLocation?.let { location ->
@@ -232,11 +232,24 @@ fun Map(
                                 "latitude" to location.latitude,
                                 "longitude" to location.longitude
                             )
+
+                            // Salvar a posição do portal no Firebase
                             newPortalRef.setValue(portalMap)
                                 .addOnSuccessListener {
                                     Toast.makeText(context, "Portal salvo no Firebase", Toast.LENGTH_SHORT).show()
+
                                     // Atualiza portalMarkers com o novo par (UID, GeoPoint)
                                     portalMarkers = portalMarkers + (portalUID!! to GeoPoint(location.latitude, location.longitude))
+
+                                    // Referência do usuário atual
+                                    val userRef = FirebaseDatabase.getInstance().getReference("Users").child(userName)
+
+                                    // Atualiza o valor de DungeonsSpotted incrementando em 1
+                                    userRef.child("DungeonsSpotted").get()
+                                        .addOnSuccessListener { snapshot ->
+                                            val currentDungeonsSpotted = snapshot.getValue<Int>() ?: 0
+                                            userRef.child("DungeonsSpotted").setValue(currentDungeonsSpotted + 1)
+                                        }
                                 }
                                 .addOnFailureListener {
                                     Toast.makeText(context, "Falha ao salvar portal", Toast.LENGTH_SHORT).show()
@@ -246,6 +259,7 @@ fun Map(
                 ) {
                     Text("Scan Portal")
                 }
+
 
                 Button(onClick = { navController.navigate("guild_screen/?$id&username=$userName") }) {
                     Text("Friends")
