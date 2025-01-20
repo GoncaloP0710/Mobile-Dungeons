@@ -65,6 +65,15 @@ fun Map(
     var portalMarkers by remember { mutableStateOf<List<Pair<String, GeoPoint>>>(emptyList()) }
     var hasLocationPermission by remember { mutableStateOf(false) }
 
+    // Inicializar o MapView
+    val mapView = remember {
+        MapView(context).apply {
+            setMultiTouchControls(true) // Permite gestos multitouch
+            setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
+            controller.setZoom(10.0) // Define o zoom inicial
+        }
+    }
+
     // Inicializar o LocationManager
     val locationManager = remember {
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -149,21 +158,11 @@ fun Map(
         }
     }
 
-    // Crie uma instância do MapView para passar para a função ListenForHelpRequestsScreen
-    val mapView = remember { MapView(context).apply {
-        setMultiTouchControls(true) // Permite gestos multitouch
-        setBuiltInZoomControls(false) // Desativa os botões de zoom embutidos
-        controller.setZoom(10.0)
-    }}
-
-    ListenForFriendRequestsScreen(db, userName)
-    ListenForHelpRequestsScreen(db, userName, mapView)
-
     // Box layout para segurar o mapa e os botões
     Box(modifier = Modifier.fillMaxSize()) {
         // MapView
         AndroidView(
-            factory = { mapView }, // Passa a instância mapView para o AndroidView
+            factory = { mapView },
             modifier = Modifier.fillMaxSize(),
             update = { mapView ->
                 currentLocation?.let { location ->
@@ -192,6 +191,7 @@ fun Map(
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.End
+
         ) {
             Box(modifier = Modifier
                 .padding(top = 16.dp)
@@ -270,8 +270,10 @@ fun Map(
             }
         }
     }
-}
 
+    ListenForFriendRequestsScreen(db, userName)
+    ListenForHelpRequestsScreen(db, userName)
+}
 
 // Função para salvar a localização atual no Firebase
 private fun saveCurrentLocation(
