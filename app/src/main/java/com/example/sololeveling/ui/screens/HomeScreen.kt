@@ -359,14 +359,12 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String, mapView:
             name = helpRequester,
             time = helpRequestTime,
             onHelpButtonClick = {
-                // Pegar a posição do usuário e reposicionar o mapa
                 userPosRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val latitude = snapshot.child("latitude").getValue(Double::class.java)
                         val longitude = snapshot.child("longitude").getValue(Double::class.java)
 
                         if (latitude != null && longitude != null) {
-                            // Reposicionar o mapa
                             moveMapToCoordinates(mapView, latitude, longitude)
                         }
                     }
