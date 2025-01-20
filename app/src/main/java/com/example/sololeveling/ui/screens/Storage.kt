@@ -37,6 +37,7 @@ import com.example.sololeveling.R
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import android.content.Context
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -114,7 +115,7 @@ fun Storage(
         ) {
             // Rotating profile picture
             Image(
-                painter = painterResource(id = R.drawable.usericon),
+                painter = painterResource(id = R.drawable.profile),
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(250.dp)
@@ -130,60 +131,6 @@ fun Storage(
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                 )
-
-            Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
-            if(edit){
-                OutlinedTextField(
-                    value = age2,
-                    onValueChange = { age2 = it },
-                    label = { Text("Age", color = Color.Black) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.Black),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black,
-                        cursorColor = Color.Black // Optionally, change the cursor color
-                    ),
-                )
-                age = age2.toInt()
-            }else{
-                Text(
-                    text = "Age: $age",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
-            if(edit){
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Description", color = Color.Black) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    textStyle = TextStyle(color = Color.Black),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black,
-                        cursorColor = Color.Black // Optionally, change the cursor color
-                    ),
-                )
-            }else{
-                Text(
-                    text = "Description: $description",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
-
-                Text(
-                    text = "Dungeons Spotted: $dungeonsSpotted2",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                )
-
             if(!edit){
                 Spacer(modifier = Modifier.height(1.dp)) // Adjusted spacing
                 PowerLevel(powerLevel)
@@ -235,37 +182,115 @@ fun Storage(
                         .addOnFailureListener { /* Handle error if needed */ }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = {
-                    val timer = object: CountDownTimer(5000, 500) {
-                        override fun onTick(millisUntilFinished: Long) {
-                            when(scanning_string){
-                                "Scanning...." -> scanning_string = "Scanning"
-                                "Scanning..." -> scanning_string = "Scanning...."
-                                "Scanning.." -> scanning_string = "Scanning..."
-                                "Scanning." -> scanning_string = "Scanning.."
-                                "Scanning" -> scanning_string = "Scanning."
-                            }
-                        }
 
-                        override fun onFinish() {
-                            wait = false
-                            scanning = false
-                        }
-                    }
-                    scanning = true
-                    wait = true
-                    timer.start()
-
-
-                }){
-                    Text("Measure Power")
-                }
                 Spacer(modifier = Modifier.height(16.dp))
 
 
 
 
             }
+            Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+            if(!edit){
+                Column(modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ){
+                        Text(
+                            text = "Age: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            text = "$age",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ){
+                        Text(
+                            text = "Dungeons Spotted: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "$dungeonsSpotted2",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                    }
+                    Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ){
+                        Text(
+                            text = "Description: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "$description",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                    }
+                }
+
+            }
+
+            if(edit){
+                OutlinedTextField(
+                    value = age2,
+                    onValueChange = { age2 = it },
+                    label = { Text("Age", color = Color.Black) },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    textStyle = TextStyle(color = Color.Black),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        cursorColor = Color.Black // Optionally, change the cursor color
+                    ),
+                )
+                age = age2.toInt()
+
+                Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description", color = Color.Black) },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    textStyle = TextStyle(color = Color.Black),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        cursorColor = Color.Black // Optionally, change the cursor color
+                    ),
+                )
+            }
+
+
+
+            Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+
+            Spacer(modifier = Modifier.height(32.dp)) // Adjusted spacing
+
+
+            Spacer(modifier = Modifier.height(16.dp)) // Adjusted spacing
             if(edit){
                 Button(onClick = {
                     edit = false
@@ -283,9 +308,41 @@ fun Storage(
                     Text("Save")
                 }
             }else{
-                Button(onClick = {edit = true}) {
-                    Text("Edit Profile")
+                Row(modifier = Modifier
+                    .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                ){
+                    Button(onClick = {edit = true}) {
+                        Text("Edit Profile")
+                    }
+                    //Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = {
+                        val timer = object: CountDownTimer(5000, 500) {
+                            override fun onTick(millisUntilFinished: Long) {
+                                when(scanning_string){
+                                    "Scanning...." -> scanning_string = "Scanning"
+                                    "Scanning..." -> scanning_string = "Scanning...."
+                                    "Scanning.." -> scanning_string = "Scanning..."
+                                    "Scanning." -> scanning_string = "Scanning.."
+                                    "Scanning" -> scanning_string = "Scanning."
+                                }
+                            }
+
+                            override fun onFinish() {
+                                wait = false
+                                scanning = false
+                            }
+                        }
+                        scanning = true
+                        wait = true
+                        timer.start()
+
+
+                    }){
+                        Text("Measure Power")
+                    }
                 }
+
                 Spacer(modifier = Modifier.height(150.dp))
                 Button(onClick = { navController.navigate("map_screen/?$id&username=$userName2") }) {
                     Text("Back")
@@ -306,11 +363,11 @@ fun Storage(
 
 @Composable
 fun PowerLevel(power : String){
-    Text(
-        text = "Power Level: ",
-        fontSize = 20.sp,
-        textAlign = TextAlign.Center,
-    )
+//    Text(
+//        text = "Power Level: ",
+//        fontSize = 20.sp,
+//        textAlign = TextAlign.Center,
+//    )
 
     when(power){
         "E" -> Text(text="E rank",

@@ -4,12 +4,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.CountDownTimer
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -34,7 +41,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.ImageLoader
 import com.example.sololeveling.R
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -82,7 +93,6 @@ fun Portal(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 if(wait){
@@ -143,16 +153,121 @@ fun Portal(
 
                         else -> Text("Erro: + $magneticField")
                     }
-                    
-                    Spacer(Modifier.size(32.dp))
-                    Button(onClick = { navController.navigate("dailies_screen/?$id&username=$name2") }) {
-                        Text("Enter Portal")
+
+                    Spacer(Modifier.size(128.dp))
+
+                    // Invite friends
+                    var friendsList by remember { mutableStateOf<List<String>>(emptyList()) }
+                    // Reference to the user's friends in Firebase
+                    val userFriendsRef = db.reference.child("UserFriendsList").child(name)
+
+                    // Set up a real-time listener for the friends list
+                    DisposableEffect(userFriendsRef) {
+                        val listener = object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                val friends = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                                friendsList = friends
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                Log.e("FirebaseError", error.message)
+                            }
+                        }
+                        userFriendsRef.addValueEventListener(listener)
+                        onDispose { userFriendsRef.removeEventListener(listener) }
+                    }
+
+                    Text(
+                        text = "Invite Friends",
+                        style = MaterialTheme.typography.headlineMedium.copy(color = Color.White),
+                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                    )
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)), // Semi-transparent card background
+                    ) {
+
+                        LazyColumn(
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            items(friendsList) { friend ->
+                                // Use a state to store the power level for each friend
+                                var powerLevel by remember { mutableStateOf<String>("") }
+
+                                // Fetch data from Firebase
+                                val usersRef = db.getReference("UsersInfo")
+                                LaunchedEffect(friend) { // Launching the effect when a new friend is encountered
+                                    usersRef.child(friend).get().addOnSuccessListener { snapshot ->
+                                        if (snapshot.exists()) {
+                                            powerLevel =
+                                                snapshot.child("PowerLevel").getValue<String>()
+                                                    .orEmpty()
+                                        } else {
+                                            powerLevel = "Rank not found"
+                                        }
+                                    }.addOnFailureListener {
+                                        println("Error: ${it.message}")
+                                        powerLevel = "Error fetching data"
+                                    }
+                                }
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween, // Distribute space between items
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                ) {
+                                    // Left side: Friend's name and image
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.usericon), // Replace with your image resource
+                                            contentDescription = "User Icon",
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .padding(end = 8.dp)
+                                        )
+                                        Text(
+                                            text = friend,
+                                            fontSize = 18.sp,
+                                            color = Color.White,
+                                            modifier = Modifier.padding(4.dp)
+                                        )
+                                    }
+
+                                    Button(onClick = {
+                                        val portalInvite = db.reference.child("UserPortalInvite").child(friend)
+                                        portalInvite.get().addOnSuccessListener { userSnapshot ->
+                                            val userInvited = userSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+                                            portalInvite.setValue(userInvited + name)
+                                        }
+
+                                    }) {
+                                        Text("Send invite", fontSize = 16.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.size(24.dp))
+                    // Enter Portal Button
+                    Button(
+                        onClick = { navController.navigate("dailies_screen/?$id&username=$name2") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f))
+
+                    ) {
+                        Text("Enter Portal", fontSize = 18.sp, color = Color.White)
                     }
                 }
-
             }
-
         },
+
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -181,5 +296,18 @@ fun Portal(
             }
         }
     )
+}
 
+@Composable
+fun RankText(rank: String, startColor: Color, endColor: Color) {
+    Text(
+        text = rank,
+        style = TextStyle(
+            fontSize = 64.sp,
+            fontWeight = FontWeight.Bold,
+            brush = Brush.linearGradient(
+                colors = listOf(startColor, endColor)
+            )
+        )
+    )
 }

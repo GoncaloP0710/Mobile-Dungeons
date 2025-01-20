@@ -24,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -154,7 +155,7 @@ fun Guild(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "friendsList") Color.Blue else Color.Gray // Change color based on active button
+                        if (activeButton == "friendsList") Color.Black else Color.Gray // Change color based on active button
                     )
                 ) {
                     Text("Friends List", fontSize = 16.sp, color = Color.White)
@@ -172,7 +173,7 @@ fun Guild(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "friendRequests") Color.Blue else Color.Gray // Change color based on active button
+                        if (activeButton == "friendRequests") Color.Black else Color.Gray // Change color based on active button
                     )
                 ) {
                     Text("Friend Requests", fontSize = 16.sp, color = Color.White)
@@ -190,7 +191,7 @@ fun Guild(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        if (activeButton == "sendRequests") Color.Blue else Color.Gray // Change color based on active button
+                        if (activeButton == "sendRequests") Color.Black else Color.Gray // Change color based on active button
                     )
                 ) {
                     Text("Send Requests", fontSize = 16.sp, color = Color.White)
@@ -353,8 +354,13 @@ fun Guild(
                     OutlinedTextField(
                         value = friendRequestName,
                         onValueChange = { friendRequestName = it },
-                        label = { Text("Enter username") },
-                        modifier = Modifier.weight(1f)
+                        label = { Text("Enter username", color = Color.White)},
+                        modifier = Modifier.weight(1f),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            cursorColor = Color.White
+                        ),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     var showDialog by remember { mutableStateOf(false) }
