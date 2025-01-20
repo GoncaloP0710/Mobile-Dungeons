@@ -190,6 +190,53 @@ fun Storage(
 
             }
             Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+            if(!edit){
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ){
+                    Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                            horizontalAlignment = Alignment.End){
+                        Text(
+                            text = "Age: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                        Text(
+                            text = "Dungeons Spotted: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                        Text(
+                            text = "Description: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Column(modifier = Modifier.fillMaxWidth().weight(2f)){
+                        Text(
+                            text = "$age",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                        Text(
+                            text = "$dungeonsSpotted2",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                        Text(
+                            text = "$description",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            }
+
             if(edit){
                 OutlinedTextField(
                     value = age2,
@@ -204,25 +251,9 @@ fun Storage(
                     ),
                 )
                 age = age2.toInt()
-            }else{
-                Text(
-                    text = "Age: $age",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                )
-            }
 
+                Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
 
-
-            Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
-
-                Text(
-                    text = "Dungeons Spotted: $dungeonsSpotted2",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                )
-            Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
-            if(edit){
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
@@ -235,17 +266,14 @@ fun Storage(
                         cursorColor = Color.Black // Optionally, change the cursor color
                     ),
                 )
-            }else{
-                Text(
-                    text = "Description: $description",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                )
             }
-            Spacer(modifier = Modifier.height(32.dp)) // Adjusted spacing
-            if(!edit){
 
-            }
+
+
+            Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+
+            Spacer(modifier = Modifier.height(32.dp)) // Adjusted spacing
+
 
             Spacer(modifier = Modifier.height(16.dp)) // Adjusted spacing
             if(edit){
