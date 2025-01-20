@@ -191,50 +191,62 @@ fun Storage(
             }
             Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
             if(!edit){
-                Row (
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ){
-                    Column(modifier = Modifier.fillMaxWidth().weight(1f),
-                            horizontalAlignment = Alignment.End){
+                Column(modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                    ){
                         Text(
                             text = "Age: ",
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
-                        Text(
-                            text = "Dungeons Spotted: ",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
-                        Text(
-                            text = "Description: ",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    Column(modifier = Modifier.fillMaxWidth().weight(2f)){
                         Text(
                             text = "$age",
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                    }
+                    Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                    Row (
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(
+                            text = "Dungeons Spotted: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
                         Text(
                             text = "$dungeonsSpotted2",
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+
+                    }
+                    Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacing
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                    ){
+                        Text(
+                            text = "Description: ",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
+                        )
                         Text(
                             text = "$description",
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f)
                         )
+
                     }
                 }
+
             }
 
             if(edit){
