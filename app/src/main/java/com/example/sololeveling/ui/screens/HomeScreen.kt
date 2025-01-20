@@ -355,11 +355,18 @@ fun ListenForHelpRequestsScreen(db: FirebaseDatabase, userName: String) {
             name = helpRequester,
             time = helpRequestTime
         )
+
+        // Remove the processed request from Firebase after dialog confirmation
+        userHelpRef.child(helpRequester).removeValue()
+            .addOnSuccessListener {
+                Log.d("FirebaseCleanup", "Removed processed help request from $helpRequester")
+            }
+            .addOnFailureListener {
+                Log.e("FirebaseCleanupError", it.message ?: "Error removing processed request")
+            }
+
     }
 }
-
-
-
 
 @Composable
 fun HelpNotificationDialog(
