@@ -41,6 +41,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import kotlin.random.Random
 
 private const val LOCATION_REFRESH_TIME = 15000L // 15 segundos para atualizar
 private const val LOCATION_REFRESH_DISTANCE = 500f // 500 metros para atualizar
@@ -65,6 +66,7 @@ fun Map(
     var currentLocation by remember { mutableStateOf<GeoPoint?>(null) }
     var portalMarkers by remember { mutableStateOf<List<Pair<String, GeoPoint>>>(emptyList()) }
     var hasLocationPermission by remember { mutableStateOf(false) }
+    var id2 by remember { mutableStateOf(id) }
 
     // Inicializar o MapView
     val mapView = remember {
@@ -149,6 +151,7 @@ fun Map(
                 val uid = child.key // Obtém o UID
                 val latitude = child.child("latitude").getValue(Double::class.java)
                 val longitude = child.child("longitude").getValue(Double::class.java)
+                id2 = child.child("uid").getValue(Int::class.java)!!
                 if (uid != null && latitude != null && longitude != null) {
                     uid to GeoPoint(latitude, longitude) // Cria um par (UID, GeoPoint)
                 } else null
@@ -178,7 +181,7 @@ fun Map(
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Portal $uid" // Mostra o UID no título
                         setOnMarkerClickListener { _, _ ->
-                            navController.navigate("portal_screen/?uid=$uid&username=$user")
+                            navController.navigate("portal_screen/?id=$id2&username=$user")
                             true
                         }
                     }
@@ -228,10 +231,11 @@ fun Map(
                 Button(
                     onClick = {
                         currentLocation?.let { location ->
-                            val newPortalRef = portalPositionRef.push() // Gera uma nova referência com UID único
+                            val randomInt = Random.nextInt()
+                            val newPortalRef = portalPositionRef.child(randomInt.toString()) // Gera uma nova referência com UID único
                             val portalUID = newPortalRef.key // Obtém o UID único gerado
                             val portalMap = mapOf(
-                                "uid" to portalUID, // Adiciona o UID ao mapa
+                                "uid" to randomInt, // Adiciona o UID ao mapa
                                 "latitude" to location.latitude,
                                 "longitude" to location.longitude
                             )
@@ -245,7 +249,7 @@ fun Map(
                                     portalMarkers = portalMarkers + (portalUID!! to GeoPoint(location.latitude, location.longitude))
 
                                     // Referência do usuário atual
-                                    val userRef = db.reference.child("Users").child(userName)
+                                    val userRef = db.reference.child("UsersInfo").child(userName)
                                     userRef.child("DungeonsSpotted").get()
                                         .addOnSuccessListener { snapshot ->
                                             val currentDungeonsSpotted = snapshot.getValue<Int>() ?: 0

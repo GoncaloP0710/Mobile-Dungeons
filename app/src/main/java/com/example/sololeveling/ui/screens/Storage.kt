@@ -179,7 +179,7 @@ fun Storage(
                         "Age" to age,
                         "Name" to userName2,
                         "Description" to description,
-                        "DungeonsSpotted" to dungeonsSpotted2.toInt(),
+                        "DungeonsSpotted" to dungeonsSpotted.toInt(),
                         "PowerLevel" to powerLevel
                     )
                     usersRef.child(userName).updateChildren(updateInfo)
@@ -232,7 +232,7 @@ fun Storage(
                             InfoRow(label = "Age:", value = "$age")
 
                             // Dungeons Spotted Row
-                            InfoRow(label = "Dungeons Spotted:", value = "$dungeonsSpotted2")
+                            InfoRow(label = "Dungeons Spotted:", value = "$dungeonsSpotted")
 
                             // Description Row
                             InfoRow(label = "Description:", value = "$description")
@@ -308,7 +308,7 @@ fun Storage(
                                 "Age" to age,
                                 "Name" to userName2,
                                 "Description" to description,
-                                "DungeonsSpotted" to dungeonsSpotted2.toInt(),
+                                "DungeonsSpotted" to dungeonsSpotted.toInt(),
                                 "PowerLevel" to powerLevel
                             )
                             usersRef.child(userName).updateChildren(updateInfo)

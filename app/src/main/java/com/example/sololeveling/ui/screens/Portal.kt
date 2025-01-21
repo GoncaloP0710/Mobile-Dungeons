@@ -279,25 +279,20 @@ fun Portal(
 
                     Button(
                         onClick = {
-                            val navBackStackEntry = navController.currentBackStackEntry
-                            val arguments = navBackStackEntry?.arguments
-                            val uid = arguments?.getString("uid")
 
-                            if (uid != null) {
-                                val portalRef = db.reference.child("Portals").child(uid)
+                                val portalRef = db.reference.child("Portals").child(id.toString())
 
                                 portalRef.removeValue()
                                     .addOnSuccessListener {
-                                        Log.d("ClosePortal", "Portal $uid successfully removed.")
+                                        Log.d("ClosePortal", "Portal $id successfully removed.")
                                         // Navegar de volta para a tela do mapa
                                         navController.navigate("map_screen/?$id&username=$name")
                                     }
                                     .addOnFailureListener { error ->
                                         Log.e("ClosePortal", "Failed to close portal: ${error.message}")
                                     }
-                            } else {
-                                Log.e("ClosePortal", "UID is null!")
-                            }
+
+
                         },
                         modifier = Modifier
                             .fillMaxWidth()
