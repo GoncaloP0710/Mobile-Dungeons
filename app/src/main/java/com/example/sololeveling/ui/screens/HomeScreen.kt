@@ -80,7 +80,7 @@ fun HomeScreen(
         )
 
         // Login Dialog
-        if (showDialog) {
+
             Dialog(onDismissRequest = { } ) {
                 Column(
                     modifier = Modifier
@@ -185,7 +185,7 @@ fun HomeScreen(
                     }
                 }
             }
-        }
+
     }
 }
 

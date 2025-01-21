@@ -37,6 +37,7 @@ import com.example.sololeveling.R
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -117,6 +118,15 @@ fun Storage(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.logout),
+                contentDescription = "logout Image",
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .size(50.dp)
+                    .clickable {navController.navigate("home_screen/?6&username=")  }
+
+            )
             // Rotating profile picture
             Image(
                 painter = painterResource(id = R.drawable.profile),
