@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.delay
@@ -465,6 +466,7 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
     var inviteRequester by remember { mutableStateOf("") }
     var requesterLatitude by remember { mutableStateOf(0.0) }
     var requesterLongitude by remember { mutableStateOf(0.0) }
+    val inviteQueue = remember { mutableStateListOf<Pair<String, String>>() } // Queue for invites
 
     // Reference to the UserPortalInvite node for the current user
     val userInviteRef = db.reference.child("UserPortalInvite").child(userName)
@@ -472,26 +474,26 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
     DisposableEffect(userInviteRef) {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.hasChildren()) {
-                    val firstInviteKey = snapshot.children.firstOrNull()?.key
-                    val firstInviteValue = snapshot.children.firstOrNull()?.getValue(String::class.java)
+                snapshot.children.forEach { child ->
+                    val inviteKey = child.key
+                    val inviteValue = child.getValue(String::class.java)
 
-                    if (firstInviteKey != null && firstInviteValue != null) {
-                        inviteRequester = firstInviteValue
-                        // Fetch position from UserPosition for the inviteRequester
-                        db.reference.child("UserPosition").child(inviteRequester)
-                            .get()
-                            .addOnSuccessListener { positionSnapshot ->
-                                requesterLatitude = positionSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
-                                requesterLongitude = positionSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
-
-                                // Show dialog after coordinates are updated
-                                showDialog.value = true
-                            }
-                            .addOnFailureListener {
-                                Log.e("InviteDebug", "Failed to fetch position: ${it.message}")
-                            }
+                    if (inviteKey != null && inviteValue != null) {
+                        // Add invite to the queue if not already present
+                        if (!inviteQueue.any { it.first == inviteKey }) {
+                            inviteQueue.add(Pair(inviteKey, inviteValue))
+                        }
                     }
+                }
+
+                // Show the dialog for the first invite in the queue
+                if (!showDialog.value && inviteQueue.isNotEmpty()) {
+                    processNextInvite(
+                        db, userInviteRef, inviteQueue, showDialog,
+                        { name -> inviteRequester = name },
+                        { lat -> requesterLatitude = lat },
+                        { lon -> requesterLongitude = lon }
+                    )
                 }
             }
 
@@ -507,46 +509,72 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
         }
     }
 
-    //Show the dialog when an invite is received
+    // Show the dialog when an invite is ready
     if (showDialog.value) {
         InviteDungeonDialog(
             showDialog = showDialog,
             name = inviteRequester,
             onAccept = {
-                // Move the map to the requester's coordinates
-                moveMapToCoordinates(mapView, requesterLatitude, requesterLongitude)
-                // Close the dialog
-                showDialog.value = false
+                showDialog.value = false // Close the dialog
+                moveMapToCoordinates(mapView, requesterLatitude, requesterLongitude) // Move map to invite location
+
+                // Process the next invite after accepting
+                if (inviteQueue.isNotEmpty()) {
+                    processNextInvite(
+                        db, userInviteRef, inviteQueue, showDialog,
+                        { name -> inviteRequester = name },
+                        { lat -> requesterLatitude = lat },
+                        { lon -> requesterLongitude = lon }
+                    )
+                }
             }
         )
     }
+}
 
-        // Accept friend request
-        val requestRef =
-            userInviteRef.child(inviteRequester)
-        requestRef.get().addOnSuccessListener { snapshot ->
-            val requests = snapshot.getValue(object :
-                GenericTypeIndicator<List<String>>() {})
-                ?: emptyList()
+fun processNextInvite(
+    db: FirebaseDatabase,
+    userInviteRef: DatabaseReference,
+    inviteQueue: MutableList<Pair<String, String>>,
+    showDialog: MutableState<Boolean>,
+    updateRequester: (String) -> Unit,
+    updateLatitude: (Double) -> Unit,
+    updateLongitude: (Double) -> Unit
+) {
+    if (inviteQueue.isEmpty()) return // Do nothing if the queue is empty
 
-            // Remove the original request with the '@n' part
-            val updatedRequests =
-                requests.filterNot { it == inviteRequester } // Properly remove the entire request
+    val currentInvite = inviteQueue.first() // Get the first invite in the queue
+    val (inviteKey, inviteValue) = currentInvite
 
-            // Remove the request from Firebase once accepted
-            requestRef.setValue(updatedRequests)
+    // Update the inviteRequester for the dialog
+    updateRequester(inviteValue)
+
+    // Fetch position from UserPosition for the inviteRequester
+    db.reference.child("UserPosition").child(inviteValue)
+        .get()
+        .addOnSuccessListener { positionSnapshot ->
+            updateLatitude(positionSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0)
+            updateLongitude(positionSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0)
+
+            // Show the dialog after coordinates are updated
+            showDialog.value = true
+        }
+        .addOnFailureListener {
+            Log.e("InviteDebug", "Failed to fetch position: ${it.message}")
         }
 
-//        // Remove the processed invite from the database
-//        userInviteRef.child(inviteRequester).removeValue()
-//            .addOnSuccessListener {
-//                Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
-//            }
-//            .addOnFailureListener {
-//                Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
-//            }
-
+    // Remove the invite from Firebase only after the dialog is closed
+    userInviteRef.child(inviteKey).removeValue()
+        .addOnSuccessListener {
+            Log.d("FirebaseCleanup", "Removed processed invite: $inviteKey")
+            inviteQueue.removeFirstOrNull() // Remove invite from the queue after successful deletion
+        }
+        .addOnFailureListener {
+            Log.e("FirebaseCleanupError", "Error removing invite: ${it.message}")
+        }
 }
+
+
 
 @Composable
 fun InviteDungeonDialog(
