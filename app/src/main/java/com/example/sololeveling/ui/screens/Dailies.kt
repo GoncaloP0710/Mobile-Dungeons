@@ -50,7 +50,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -170,29 +173,65 @@ fun Dailies(
                                 .padding(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            measureMagneticField(context) { magneticField = it }
-                            Text(
-                                text = "Magnetic Field: $magneticField µT",
-                                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
-                            )
+//                            measureMagneticField(context) { magneticField = it }
+//                            Text(
+//                                text = "Magnetic Field: $magneticField µT",
+//                                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+//                            )
                             measureAmbientTemperature(context) { ambientTemperature = it }
                             Text(
-                                text = "Ambient Temperature: $ambientTemperature °C",
+                                text = buildAnnotatedString {
+                                    append("Ambient Temperature: ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = if (dangerTemp(ambientTemperature)) Color.Red else Color.Green
+                                        )
+                                    ){
+                                        append("$ambientTemperature °C")
+                                    }
+                                },
                                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
                             )
                             measurePressure(context) { pressure = it }
                             Text(
-                                text = "Pressure: $pressure hPa",
+                                text =  buildAnnotatedString{
+                                    append("Pressure: ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = if (dangerPress(pressure)) Color.Red else Color.Green
+                                        )
+                                    ){
+                                            append("$pressure hPa")
+                                        }
+                                } ,
                                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
                             )
                             measureHumidity(context) { humidity = it }
                             Text(
-                                text = "Humidity: $humidity %",
+                                text = buildAnnotatedString{
+                                    append("Humidity: ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = if (dangerHumidity(humidity)) Color.Red else Color.Green
+                                        )
+                                    ){
+                                        append("$humidity %")
+                                    }
+                                } ,
                                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
                             )
                             measureLight(context) { lightLevel = it }
                             Text(
-                                text = "Light Level: $lightLevel lx",
+                                text = buildAnnotatedString{
+                                    append("Light Level: ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = if (dangerousLum(lightLevel)) Color.Red else Color.Green
+                                        )
+                                    ){
+                                        append("$lightLevel lx")
+                                    }
+                                } ,
                                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
                             )
                         }
@@ -592,4 +631,19 @@ fun formatTimestamp(timestamp: Long): String {
         val simpleDateFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
         simpleDateFormat.format(date)
     }
+}
+
+fun dangerTemp(temp: Float): Boolean{
+    return temp>50.0 || temp<0.0
+}
+fun dangerPress(press: Double): Boolean{
+    return press>2000.0 || press<700.0
+}
+
+fun dangerHumidity(hum: Float): Boolean{
+    return hum>80.0 || hum<20.0
+}
+
+fun dangerousLum(lum: Float): Boolean{
+    return lum>10000.0 || lum<25.5
 }
