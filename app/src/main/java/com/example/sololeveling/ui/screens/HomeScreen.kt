@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.delay
 import org.osmdroid.views.MapView
@@ -477,9 +478,8 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
 
                     if (firstInviteKey != null && firstInviteValue != null) {
                         inviteRequester = firstInviteValue
-
                         // Fetch position from UserPosition for the inviteRequester
-                        db.reference.child("UserPosition").child(userName)
+                        db.reference.child("UserPosition").child(inviteRequester)
                             .get()
                             .addOnSuccessListener { positionSnapshot ->
                                 requesterLatitude = positionSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
@@ -507,7 +507,7 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
         }
     }
 
-    // Show the dialog when an invite is received
+    //Show the dialog when an invite is received
     if (showDialog.value) {
         InviteDungeonDialog(
             showDialog = showDialog,
@@ -519,15 +519,33 @@ fun ListenForDungeonInviteScreen(db: FirebaseDatabase, userName: String, mapView
                 showDialog.value = false
             }
         )
-        // Remove the processed invite from the database
-        userInviteRef.child(inviteRequester).removeValue()
-            .addOnSuccessListener {
-                Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
-            }
-            .addOnFailureListener {
-                Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
-            }
     }
+
+        // Accept friend request
+        val requestRef =
+            userInviteRef.child(inviteRequester)
+        requestRef.get().addOnSuccessListener { snapshot ->
+            val requests = snapshot.getValue(object :
+                GenericTypeIndicator<List<String>>() {})
+                ?: emptyList()
+
+            // Remove the original request with the '@n' part
+            val updatedRequests =
+                requests.filterNot { it == inviteRequester } // Properly remove the entire request
+
+            // Remove the request from Firebase once accepted
+            requestRef.setValue(updatedRequests)
+        }
+
+//        // Remove the processed invite from the database
+//        userInviteRef.child(inviteRequester).removeValue()
+//            .addOnSuccessListener {
+//                Log.d("FirebaseCleanup", "Removed processed invite from $inviteRequester")
+//            }
+//            .addOnFailureListener {
+//                Log.e("FirebaseCleanupError", it.message ?: "Error removing processed invite")
+//            }
+
 }
 
 @Composable
