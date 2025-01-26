@@ -9,7 +9,6 @@ Mobile Dungeons is an Android application that integrates various features such 
 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
     <img src="ReadMeFiles/map.png" alt="Map Screen" width="200"/>
     <img src="ReadMeFiles/profile.png" alt="Profile Screen" width="200"/>
-    <img src="ReadMeFiles/friendslist.png" alt="Friends Screen" width="200"/>
     <img src="ReadMeFiles/portal.png" alt="Portal Screen" width="200"/>
     <img src="ReadMeFiles/dungeon.png" alt="Dungeon Screen" width="200"/>
 </div>
@@ -17,7 +16,7 @@ Mobile Dungeons is an Android application that integrates various features such 
 ### Video Demo
 
 <a href="https://www.youtube.com/watch?v=GwzOd6byjmU">
-    <img src="https://img.youtube.com/vi/GwzOd6byjmU/0.jpg" alt="Watch the video" width="200"/>
+    <img src="https://img.youtube.com/vi/GwzOd6byjmU/0.jpg" alt="Watch the video" width="300"/>
 </a>
 
 Click the image above to watch a video of the app.
@@ -45,7 +44,7 @@ Click the image above to watch a video of the app.
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/GoncaloP0710/SoloLeveling.git
+    git clone https://github.com/GoncaloP0710/Mobile-Dungeons.git
     ```
 2. Open the project in Android Studio.
 3. Sync the project with Gradle files.
