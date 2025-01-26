@@ -1,6 +1,16 @@
-# SoloLeveling
+# Mobile Dungeons
 
-SoloLeveling is an Android application that integrates various features such as user authentication, real-time data updates from Firebase, interactive maps using OSMDroid, and the gathering of monster info with the dnd5eapi. The app is designed to provide a comprehensive experience for users, including functionalities like login, viewing and managing friends, scan different portals to obtain information on it, and more.
+Mobile Dungeons is an Android application that integrates various features such as user authentication, real-time data updates from Firebase, interactive maps using OSMDroid, and the gathering of monster info with the dnd5eapi. The app is designed to provide a comprehensive experience for users, including functionalities like login, viewing and managing friends, scan different portals to obtain information on it, and more.
+
+## Preview
+
+![Map Screen](ReadMeFiles/map.png)
+![Profile Screen](ReadMeFiles/profile.png)
+![Friends Screen](ReadMeFiles/friendslist.png)
+![Portal Screen](ReadMeFiles/portal.png)
+![Dungeon Screen](ReadMeFiles/dungeon.png)
+
+[![Watch the video](https://img.youtube.com/vi/GwzOd6byjmU/0.jpg)](https://www.youtube.com/watch?v=GwzOd6byjmU)
 
 ## Features
 
@@ -37,17 +47,6 @@ SoloLeveling is an Android application that integrates various features such as 
 - **OSMDroid**: For interactive maps.
 - **Jetpack Compose**: For building UI components.
 - **Material3**: For modern UI components.
-
-## Usage
-
-1. **Login/Register**:
-    - Open the app and log in with your credentials or register a new account.
-2. **Navigate**:
-    - Use the navigation buttons to move between different screens.
-3. **Manage Friends**:
-    - View and manage your friends and friend requests in the Guild screen.
-4. **Interact with Map**:
-    - Use the Map screen to view your location and nearby portals.
 
 ## License
 
