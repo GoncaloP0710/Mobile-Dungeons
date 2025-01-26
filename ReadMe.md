@@ -4,13 +4,23 @@ Mobile Dungeons is an Android application that integrates various features such 
 
 ## Preview
 
-![Map Screen](ReadMeFiles/map.png)
-![Profile Screen](ReadMeFiles/profile.png)
-![Friends Screen](ReadMeFiles/friendslist.png)
-![Portal Screen](ReadMeFiles/portal.png)
-![Dungeon Screen](ReadMeFiles/dungeon.png)
+### Images
 
-[![Watch the video](https://img.youtube.com/vi/GwzOd6byjmU/0.jpg)](https://www.youtube.com/watch?v=GwzOd6byjmU)
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <img src="ReadMeFiles/map.png" alt="Map Screen" width="200"/>
+    <img src="ReadMeFiles/profile.png" alt="Profile Screen" width="200"/>
+    <img src="ReadMeFiles/friendslist.png" alt="Friends Screen" width="200"/>
+    <img src="ReadMeFiles/portal.png" alt="Portal Screen" width="200"/>
+    <img src="ReadMeFiles/dungeon.png" alt="Dungeon Screen" width="200"/>
+</div>
+
+### Video Demo
+
+<a href="https://www.youtube.com/watch?v=GwzOd6byjmU">
+    <img src="https://img.youtube.com/vi/GwzOd6byjmU/0.jpg" alt="Watch the video" width="200"/>
+</a>
+
+Click the image above to watch a video of the app.
 
 ## Features
 
